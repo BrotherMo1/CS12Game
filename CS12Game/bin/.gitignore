@@ -1,11 +1,12 @@
-/Main.class
 /AlienEntity.class
 /AlienShotEntity.class
 /Entity.class
+/Game$1.class
+/Game$KeyInputHandler.class
 /Game.class
+/Main.class
 /ShipEntity.class
 /ShotEntity.class
 /Sprite.class
 /SpriteStore.class
-/Game$1.class
-/Game$KeyInputHandler.class
+/sprites/
