@@ -29,6 +29,7 @@ public class Game extends Canvas {
                                                             // to remove this loop
         private Entity ship;  // the ship
         private double moveSpeed = 600; // hor. vel. of ship (px/s)
+        private double yvel = 0;
         private long lastFire = 0; // time last shot fired
         private long alienLastFire = 0;
         private int random = 0;
@@ -281,7 +282,7 @@ public class Game extends Canvas {
 	             g.setColor(Color.white);
 	             g.drawString(message, (1000 - g.getFontMetrics().stringWidth(message))/2, 250);
 	             g.drawString("Press any key", (1000 - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
-	           }  // if
+	           	}  // if
 	
 	            // clear graphics and flip buffer
 	            g.dispose();
@@ -303,12 +304,22 @@ public class Game extends Canvas {
 	              tryToFire();
 	            } // if
 	            
+	            // gravity
+	            
+	            
 	            // jumping
-	            if ((upPressed)) {
-	            	ship.setVerticalMovement(-50);
-	            } else if(ship.getY() <= 950 ) {
-	            	ship.setVerticalMovement(50);
+	            if (upPressed && ship.getY() >= 950) {
+	            	yvel = -1000;
+	            	ship.setVerticalMovement(yvel);
+
+	            }else if(ship.getY() <= 950 ) {
+	            	yvel += 50;
+	            	ship.setVerticalMovement(yvel);
+	            } else {
+	            	yvel = 0;
 	            }
+	            
+
 	            
 	            // pause
 	            try { Thread.sleep(10); } catch (Exception e) {}
