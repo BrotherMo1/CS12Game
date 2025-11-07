@@ -27,7 +27,7 @@ public class Game extends Canvas {
                                                       // in game
         private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
                                                             // to remove this loop
-        private Entity ship;  // the ship
+        private Entity player;  // the ship
         private double moveSpeed = 600; // hor. vel. of ship (px/s)
         private double yvel = 0;
         private long lastFire = 0; // time last shot fired
@@ -105,8 +105,8 @@ public class Game extends Canvas {
     	 */
     	private void initEntities() {
               // create the ship and put in center of screen
-              ship = new ShipEntity(this, "sprites/ship1.png", 0, 950);
-              entities.add(ship);
+              player = new Player(this, "sprites/ship1.png", 0, 950);
+              entities.add(player);
     
               // create a block of aliens (5x12)
               alienCount = 0;
@@ -181,7 +181,7 @@ public class Game extends Canvas {
           // otherwise add a shot
           lastFire = System.currentTimeMillis();
           ShotEntity shot = new ShotEntity(this, "sprites/shot.gif", 
-                            ship.getX() + 10, ship.getY() - 30);
+                            player.getX() + 10, player.getY() - 30);
           entities.add(shot);
         } // tryToFire
         
@@ -289,14 +289,14 @@ public class Game extends Canvas {
 	            strategy.show();
 	
 	            // ship should not move without user input
-	            ship.setHorizontalMovement(0);
-	            ship.setVerticalMovement(0);
-	
+	            player.setHorizontalMovement(0);
+	            //player.setVerticalMovement(0);
+	  
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
-	              ship.setHorizontalMovement(-moveSpeed);
+	              player.setHorizontalMovement(-moveSpeed);
 	            } else if ((rightPressed) && (!leftPressed)) {
-	              ship.setHorizontalMovement(moveSpeed);
+	              player.setHorizontalMovement(moveSpeed);
 	            } // else
 	            
 	            // if spacebar pressed, try to fire
@@ -308,15 +308,8 @@ public class Game extends Canvas {
 	            
 	            
 	            // jumping
-	            if (upPressed && ship.getY() >= 950) {
-	            	yvel = -1000;
-	            	ship.setVerticalMovement(yvel);
-
-	            }else if(ship.getY() <= 950 ) {
-	            	yvel += 50;
-	            	ship.setVerticalMovement(yvel);
-	            } else {
-	            	yvel = 0;
+	            if (upPressed) {
+	            	player.jump();
 	            }
 	            
 
