@@ -16,10 +16,10 @@ public class Game extends Canvas {
         private boolean waitingForKeyPress = true;  // true if game held up until
                                                     // a key is pressed
         
-        private final int GAME_HEIGHT = 1000;
-        private final int GAME_WIDTH = 1000;
-        private final int TILE_HEIGHT = 32;
-        private final int TILE_WIDTH = 32;
+        protected static final int GAME_HEIGHT = 1000;
+        protected static final int GAME_WIDTH = 1000;
+        protected static final int TILES_SIZE = 32;
+
         
         private boolean leftPressed = false;  // true if left arrow key currently pressed
         private boolean rightPressed = false; // true if right arrow key currently pressed

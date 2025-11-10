@@ -24,15 +24,6 @@ public class Level {
 	private BufferedImage img;
 	private int[][] lvlData;
 
-	private ArrayList<Crabby> crabs = new ArrayList<>();
-	private ArrayList<Pinkstar> pinkstars = new ArrayList<>();
-	private ArrayList<Shark> sharks = new ArrayList<>();
-	private ArrayList<Potion> potions = new ArrayList<>();
-	private ArrayList<Spike> spikes = new ArrayList<>();
-	private ArrayList<GameContainer> containers = new ArrayList<>();
-	private ArrayList<Cannon> cannons = new ArrayList<>();
-	private ArrayList<BackgroundTree> trees = new ArrayList<>();
-	private ArrayList<Grass> grass = new ArrayList<>();
 
 	private int lvlTilesWide;
 	private int maxTilesOffset;
