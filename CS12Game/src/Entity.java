@@ -18,12 +18,7 @@
     protected Sprite sprite; // this entity's sprite
     protected double dx; // horizontal speed (px/s)  + -> right
     protected double dy; // vertical speed (px/s) + -> down
-    
-    private boolean isJumping = false;   // Is the player currently jumping?
-    private boolean onGround = false;    // Is the player on the ground or a platform?
-    
-    private static final double GRAVITY = 800;  // The strength of gravity
-    private static final double JUMP_STRENGTH = -500;  // The strength of the jump
+   
     
     private Rectangle me = new Rectangle(); // bounding rectangle of
                                             // this entity
@@ -41,6 +36,7 @@
        y = newY;
        sprite = (SpriteStore.get()).getSprite(r);
      } // constructor
+     
 
      /* move
       * input: delta - the amount of time passed in ms
@@ -51,25 +47,16 @@
      public void move(long delta) {
        // update location of entity based on move speeds
       
-
        // Apply horizontal movement
        x += dx * delta / 1000.0;  // Update x position
 
        // Update vertical position (y)
        y += dy * delta / 1000.0;  // Update y position
        
-      
-       
      } // move
      
-     
-     
      public void jump() {
-    	 if (!isJumping && onGround) {
- 			isJumping = true;
- 			dy = JUMP_STRENGTH;
- 			onGround = false;
- 		} // if
+    	 System.out.println("try jump");
      }
 
      // get and set velocities

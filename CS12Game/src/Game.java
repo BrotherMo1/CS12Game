@@ -15,6 +15,12 @@ public class Game extends Canvas {
       	private BufferStrategy strategy;   // take advantage of accelerated graphics
         private boolean waitingForKeyPress = true;  // true if game held up until
                                                     // a key is pressed
+        
+        private final int GAME_HEIGHT = 1000;
+        private final int GAME_WIDTH = 1000;
+        private final int TILE_HEIGHT = 32;
+        private final int TILE_WIDTH = 32;
+        
         private boolean leftPressed = false;  // true if left arrow key currently pressed
         private boolean rightPressed = false; // true if right arrow key currently pressed
         private boolean firePressed = false; // true if firing
@@ -28,7 +34,7 @@ public class Game extends Canvas {
         private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
                                                             // to remove this loop
         private Entity player;  // the ship
-        private double moveSpeed = 600; // hor. vel. of ship (px/s)
+        private double moveSpeed = 400; // hor. vel. of ship (px/s)
         private double yvel = 0;
         private long lastFire = 0; // time last shot fired
         private long alienLastFire = 0;
@@ -55,11 +61,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(1000,1000));
+    		panel.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,1000,1000);
+    		setBounds(0,0,GAME_WIDTH, GAME_HEIGHT);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -105,7 +111,7 @@ public class Game extends Canvas {
     	 */
     	private void initEntities() {
               // create the ship and put in center of screen
-              player = new Player(this, "sprites/ship1.png", 0, 950);
+              player = new Player(this, "sprites/ship1.png", 0, GAME_HEIGHT - 50);
               entities.add(player);
     
               // create a block of aliens (5x12)
@@ -230,7 +236,7 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,1000,1000);
+            g.fillRect(0,0,GAME_WIDTH, GAME_HEIGHT);
             
             if (!pause) {
 	            // move each entity
