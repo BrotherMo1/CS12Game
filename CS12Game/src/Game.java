@@ -10,31 +10,34 @@ import java.awt.image.*;
 import java.util.ArrayList;
 
 public class Game extends Canvas {
-
-
-      	private BufferStrategy strategy;   // take advantage of accelerated graphics
+	
+		private BufferStrategy strategy;   // take advantage of accelerated graphics
         private boolean waitingForKeyPress = true;  // true if game held up until
                                                     // a key is pressed
-        
-        protected static final int GAME_HEIGHT = 1000;
-        protected static final int GAME_WIDTH = 1000;
-        protected static final int TILES_SIZE = 32;
-
-        
         private boolean leftPressed = false;  // true if left arrow key currently pressed
         private boolean rightPressed = false; // true if right arrow key currently pressed
         private boolean firePressed = false; // true if firing
         private boolean upPressed = false;
         private boolean pause = false;
         		
+    	public final static int TILES_DEFAULT_SIZE = 32;
+    	public static final float SCALE = 2f;
+    	public final static int TILES_IN_WIDTH = 26;
+    	public final static int TILES_IN_HEIGHT = 14;
+    	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
+    	public final static int GAME_WIDTH = 1000;
+    	//TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
+    	public final static int GAME_HEIGHT = 1000;
+    	// TO MAKE HEIGHT SCALABLE: TILES_SIZE * TILES_IN_HEIGHT;
 
+        
         private boolean gameRunning = true;
         private ArrayList <Entity> entities = new ArrayList<Entity>(); // list of entities
                                                       // in game
         private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
                                                             // to remove this loop
-        private Entity player;  // the ship
-        private double moveSpeed = 400; // hor. vel. of ship (px/s)
+        private Entity ship;  // the ship
+        private double moveSpeed = 600; // hor. vel. of ship (px/s)
         private double yvel = 0;
         private long lastFire = 0; // time last shot fired
         private long alienLastFire = 0;
@@ -61,11 +64,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
+    		panel.setPreferredSize(new Dimension(GAME_HEIGHT,GAME_WIDTH));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,GAME_WIDTH, GAME_HEIGHT);
+    		setBounds(0,0,GAME_HEIGHT,GAME_WIDTH);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -111,8 +114,8 @@ public class Game extends Canvas {
     	 */
     	private void initEntities() {
               // create the ship and put in center of screen
-              player = new Player(this, "sprites/ship1.png", 0, GAME_HEIGHT - 50);
-              entities.add(player);
+              ship = new ShipEntity(this, "sprites/ship1.png", 0, GAME_WIDTH - 50);
+              entities.add(ship);
     
               // create a block of aliens (5x12)
               alienCount = 0;
@@ -187,7 +190,7 @@ public class Game extends Canvas {
           // otherwise add a shot
           lastFire = System.currentTimeMillis();
           ShotEntity shot = new ShotEntity(this, "sprites/shot.gif", 
-                            player.getX() + 10, player.getY() - 30);
+                            ship.getX() + 10, ship.getY() - 30);
           entities.add(shot);
         } // tryToFire
         
@@ -236,7 +239,7 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,GAME_WIDTH, GAME_HEIGHT);
+            g.fillRect(0,0,GAME_HEIGHT,GAME_WIDTH);
             
             if (!pause) {
 	            // move each entity
@@ -286,8 +289,8 @@ public class Game extends Canvas {
 	           // if waiting for "any key press", draw message
 	           if (waitingForKeyPress) {
 	             g.setColor(Color.white);
-	             g.drawString(message, (1000 - g.getFontMetrics().stringWidth(message))/2, 250);
-	             g.drawString("Press any key", (1000 - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
+	             g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message))/2, 250);
+	             g.drawString("Press any key", (GAME_HEIGHT - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
 	           	}  // if
 	
 	            // clear graphics and flip buffer
@@ -295,14 +298,14 @@ public class Game extends Canvas {
 	            strategy.show();
 	
 	            // ship should not move without user input
-	            player.setHorizontalMovement(0);
-	            //player.setVerticalMovement(0);
-	  
+	            ship.setHorizontalMovement(0);
+	            ship.setVerticalMovement(0);
+	
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
-	              player.setHorizontalMovement(-moveSpeed);
+	              ship.setHorizontalMovement(-moveSpeed);
 	            } else if ((rightPressed) && (!leftPressed)) {
-	              player.setHorizontalMovement(moveSpeed);
+	              ship.setHorizontalMovement(moveSpeed);
 	            } // else
 	            
 	            // if spacebar pressed, try to fire
@@ -314,8 +317,15 @@ public class Game extends Canvas {
 	            
 	            
 	            // jumping
-	            if (upPressed) {
-	            	player.jump();
+	            if (upPressed && ship.getY() >= GAME_WIDTH - 50) {
+	            	yvel = -GAME_HEIGHT;
+	            	ship.setVerticalMovement(yvel);
+
+	            }else if(ship.getY() <= GAME_WIDTH - 50 ) {
+	            	yvel += 50;
+	            	ship.setVerticalMovement(yvel);
+	            } else {
+	            	yvel = 0;
 	            }
 	            
 
