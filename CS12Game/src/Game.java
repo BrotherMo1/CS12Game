@@ -72,11 +72,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(1000,1000));
+    		panel.setPreferredSize(new Dimension(GAME_HEIGHT,GAME_WIDTH));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,1000,1000);
+    		setBounds(0,0,GAME_HEIGHT,GAME_WIDTH);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -322,7 +322,7 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,1000,1000);
+            g.fillRect(0,0,GAME_HEIGHT,GAME_WIDTH);
             
             if (!paused) {
 	            // move each entity
@@ -374,8 +374,8 @@ public class Game extends Canvas {
 	           // if waiting for "any key press", draw message
 	           if (waitingForKeyPress) {
 	             g.setColor(Color.white);
-	             g.drawString(message, (1000 - g.getFontMetrics().stringWidth(message))/2, 250);
-	             g.drawString("Press any key", (1000 - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
+	             g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message))/2, 250);
+	             g.drawString("Press any key", (GAME_HEIGHT - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
 	           }  // if
 	
 	            // clear graphics and flip buffer
