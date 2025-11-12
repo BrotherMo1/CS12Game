@@ -55,7 +55,7 @@ public class Game extends Canvas {
                                                        // needs to be 
                                                        // applied this loop
         
-        private boolean shifted = false;
+        protected boolean shifted = false;
         
         private ArrayList<Platform> platforms = new ArrayList<>();
         private ArrayList<int[][]> maps = new ArrayList<>();
@@ -72,11 +72,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(GAME_HEIGHT,GAME_WIDTH));
+    		panel.setPreferredSize(new Dimension(GAME_WIDTH,GAME_HEIGHT));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,GAME_HEIGHT,GAME_WIDTH);
+    		setBounds(0,0,GAME_WIDTH,GAME_HEIGHT);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -322,7 +322,7 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,GAME_HEIGHT,GAME_WIDTH);
+            g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
             
             if (!paused) {
 	            // move each entity
@@ -384,17 +384,34 @@ public class Game extends Canvas {
 	
 	            // ship should not move without user input
 	            player.setHorizontalMovement(0);
+	            boolean playerPaused = false; 
+	            long pauseStartTime = System.currentTimeMillis();
+	            if (shifted & !playerPaused) {	 
+	            	pauseStartTime = System.currentTimeMillis();	        
+			              for (int i = 0; i < entities.size(); i++) {
+				                Entity entity = (Entity) entities.get(i);
+				                entity.move(0);
+				                player.setHorizontalMovement(0);
+				                player.setVerticalMovement(0);
+				              } // for
+
+		            	if (currentMap % 2 == 0) {
+		            		currentMap ++;
+		            	} else {
+		            		currentMap --;
+		            	}
+		            	loadMap(currentMap);
+		            	
+		            	shifted = false;
+
+	            } // if shifted
 	            
-	            if (shifted) {
-	            	if (currentMap % 2 == 0) {
-	            		currentMap ++;
-	            	} else {
-	            		currentMap --;
-	            	}
-	            	loadMap(currentMap);
-	            	
-	            	shifted = false;
-	            }
+            	
+//	            if (playerPaused) {	            	
+//		            if (System.currentTimeMillis() - playerPaused >= 250) {
+//		            	playerPaused = false;
+//		            } // if
+//	            } // if
 	
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
