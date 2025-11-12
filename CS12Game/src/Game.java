@@ -25,9 +25,9 @@ public class Game extends Canvas {
     	public final static int TILES_IN_WIDTH = 26;
     	public final static int TILES_IN_HEIGHT = 14;
     	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-    	public final static int GAME_WIDTH = 1000;
-    	//TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
-    	public final static int GAME_HEIGHT = 1000;
+    	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
+    	// TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
+    	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
     	// TO MAKE HEIGHT SCALABLE: TILES_SIZE * TILES_IN_HEIGHT;
     	
 

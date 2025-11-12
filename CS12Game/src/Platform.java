@@ -11,13 +11,14 @@ public class Platform {
 	
 	Rectangle hitBox;
 	
-	public Platform(int x, int y, int width, int height) {
+	public Platform(int x, int y, int TILES_DEFAULT_SIZE, int height) {
+		
 		this.x = x;
 		this.y = y;
-		this.width = width;
-		this.height = height;
+		this.width = TILES_DEFAULT_SIZE;
+		this.height = TILES_DEFAULT_SIZE;
 		
-		hitBox = new Rectangle(x, y, width, height);
+		hitBox = new Rectangle(x, y, TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE);
 	} // Platform
 	
 	public void draw(Graphics2D gtd) {
