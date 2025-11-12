@@ -25,12 +25,17 @@ public class Game extends Canvas {
     	public final static int TILES_IN_WIDTH = 26;
     	public final static int TILES_IN_HEIGHT = 14;
     	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-    	public final static int GAME_WIDTH = 1000;
+    	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
     	//TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
-    	public final static int GAME_HEIGHT = 1000;
+    	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
     	// TO MAKE HEIGHT SCALABLE: TILES_SIZE * TILES_IN_HEIGHT;
     	
-
+    	private int xLvlOffset;
+    	private int leftBorder = (int)(0.2 * GAME_WIDTH);
+    	private int rightBorder = (int) (0.8 * GAME_WIDTH);
+    	private int lvlTilesWide = 0; 
+    	private int maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
+    	private int maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
 
         
         private boolean gameRunning = true;
@@ -72,11 +77,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(1000,1000));
+    		panel.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,1000,1000);
+    		setBounds(0,0,GAME_WIDTH,GAME_HEIGHT);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -111,6 +116,9 @@ public class Game extends Canvas {
     		
     		initMaps();
     		loadMap(0);
+    		lvlTilesWide = getMapWidth(currentMap);
+    		maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
+        	maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
     
     		// start the game
     		gameLoop();
@@ -141,6 +149,13 @@ public class Game extends Canvas {
               } // outer for
     	} // initEntities
     	
+    	private int getMapWidth(int index) {
+    		if (index < 0 || index >= maps.size()) {
+    			return 0;
+    		} // if
+    		return maps.get(index)[0].length;
+    	}
+    	
     	private void loadMap(int index) {
     		if (index < 0 || index >= maps.size()) {
     			return;
@@ -148,44 +163,51 @@ public class Game extends Canvas {
     		platforms = makePlatforms(maps.get(index));
      	}
     	
+    	private void checkCloseToBorder() {
+    		int playerX = player.getX();
+    		int diff = playerX - xLvlOffset;
+    		
+    		if (diff > rightBorder) {
+    			xLvlOffset += diff - rightBorder;
+    		} else if (diff < leftBorder) {
+    			xLvlOffset += diff - leftBorder;
+    		}
+    		
+    		if (xLvlOffset > maxLvlOffsetX) {
+    			xLvlOffset = maxLvlOffsetX;
+    		} else if (xLvlOffset < 0){
+    			xLvlOffset = 0;
+    		}
+    	}
+    	
     	private void initMaps() {
     		
 	    	
     		//java 1D version
     		int[][] map1=
-    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+	    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 	    	
     		//java 1D version
     		int[][] map2=
-    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+    			{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		   	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		   	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    		   	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 	    	
 	    	
 	    	maps.add(map1);
@@ -322,7 +344,7 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,1000,1000);
+            g.fillRect(0,0, GAME_WIDTH, GAME_HEIGHT);
             
             if (!paused) {
 	            // move each entity
@@ -333,13 +355,15 @@ public class Game extends Canvas {
 	              } // for
 	            } // if
 	
+	            checkCloseToBorder();
+	            
 	            // draw all entities
 	            for (int i = 0; i < entities.size(); i++) {
 	               Entity entity = (Entity) entities.get(i);
-	               entity.draw(g);
+	               entity.draw(g, xLvlOffset);
 	            } // for
 	            
-	            for (Platform platform : platforms) platform.draw(g);
+	            for (Platform platform : platforms) platform.draw(g, xLvlOffset);
 	
 	            // brute force collisions, compare every entity
 	            // against every other entity.  If any collisions
@@ -388,8 +412,10 @@ public class Game extends Canvas {
 	            if (shifted) {
 	            	if (currentMap % 2 == 0) {
 	            		currentMap ++;
+	            		lvlTilesWide = getMapWidth(currentMap);
 	            	} else {
 	            		currentMap --;
+	            		lvlTilesWide = getMapWidth(currentMap);
 	            	}
 	            	loadMap(currentMap);
 	            	

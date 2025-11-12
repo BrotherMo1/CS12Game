@@ -92,8 +92,8 @@
     /*
      * Draw this entity to the graphics object provided at (x,y)
      */
-     public void draw (Graphics g) {
-       sprite.draw(g,(int)x,(int)y);
+     public void draw (Graphics g, int xLvlOffset) {
+       sprite.draw(g,(int)x - xLvlOffset,(int)y);
      }  // draw
      
     /* Do the logic associated with this entity.  This method

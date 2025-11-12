@@ -73,13 +73,7 @@ public class Player extends Entity{
 		  return onGround;
 	}
 
-	public void jump () {
-		System.out.println("test1");
-
-		System.out.println(onGround);
-		
-		
-		
+	public void jump () {		
 		if (onGround) {
 			onGround = false;
 			dy = JUMP_STRENGTH;
