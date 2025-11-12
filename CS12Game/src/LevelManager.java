@@ -1,11 +1,7 @@
-package levels;
-
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import main.Game;
-import utilz.LoadSave;
 
 public class LevelManager {
 
@@ -33,10 +29,10 @@ public class LevelManager {
 
 	public void loadNextLevel() {
 		Level newLevel = levels.get(lvlIndex);
-		game.getPlaying().getEnemyManager().loadEnemies(newLevel);
-		game.getPlaying().getPlayer().loadLvlData(newLevel.getLevelData());
-		game.getPlaying().setMaxLvlOffset(newLevel.getLvlOffset());
-		game.getPlaying().getObjectManager().loadObjects(newLevel);
+//		game.getPlaying().getEnemyManager().loadEnemies(newLevel);
+//		game.getPlaying().getPlayer().loadLvlData(newLevel.getLevelData());
+//		game.getPlaying().setMaxLvlOffset(newLevel.getLvlOffset());
+//		game.getPlaying().getObjectManager().loadObjects(newLevel);
 	}
 
 	private void buildAllLevels() {
@@ -56,18 +52,18 @@ public class LevelManager {
 	}
 
 	public void draw(Graphics g, int lvlOffset) {
-		for (int j = 0; j < Game.TILES_IN_HEIGHT; j++)
-			for (int i = 0; i < levels.get(lvlIndex).getLevelData()[0].length; i++) {
-				int index = levels.get(lvlIndex).getSpriteIndex(i, j);
-				int x = Game.TILES_SIZE * i - lvlOffset;
-				int y = Game.TILES_SIZE * j;
-				if (index == 48)
-					g.drawImage(waterSprite[aniIndex], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-				else if (index == 49)
-					g.drawImage(waterSprite[4], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-				else
-					g.drawImage(levelSprite[index], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
-			}
+//		for (int j = 0; j < Game.TILES_IN_HEIGHT; j++)
+//			for (int i = 0; i < levels.get(lvlIndex).getLevelData()[0].length; i++) {
+//				int index = levels.get(lvlIndex).getSpriteIndex(i, j);
+//				int x = Game.TILES_SIZE * i - lvlOffset;
+//				int y = Game.TILES_SIZE * j;
+//				if (index == 48)
+//					g.drawImage(waterSprite[aniIndex], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
+//				else if (index == 49)
+//					g.drawImage(waterSprite[4], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
+//				else
+//					g.drawImage(levelSprite[index], x, y, Game.TILES_SIZE, Game.TILES_SIZE, null);
+//			}
 	}
 
 	public void update() {

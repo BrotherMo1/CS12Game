@@ -1,23 +1,8 @@
-package levels;
-
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import entities.Crabby;
-import entities.Pinkstar;
-import entities.Shark;
-import main.Game;
-import objects.BackgroundTree;
-import objects.Cannon;
-import objects.GameContainer;
-import objects.Grass;
-import objects.Potion;
-import objects.Spike;
-
-import static utilz.Constants.EnemyConstants.*;
-import static utilz.Constants.ObjectConstants.*;
 
 public class Level {
 
@@ -62,8 +47,8 @@ public class Level {
 		else
 			lvlData[y][x] = redValue;
 		switch (redValue) {
-		case 0, 1, 2, 3, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> 
-		grass.add(new Grass((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
+//		case 0, 1, 2, 3, 30, 31, 33, 34, 35, 36, 37, 38, 39 -> 
+//		grass.add(new Grass((int) (x * Game.TILES_SIZE), (int) (y * Game.TILES_SIZE) - Game.TILES_SIZE, getRndGrassType(x)));
 		}
 	}
 
@@ -73,27 +58,27 @@ public class Level {
 
 	private void loadEntities(int greenValue, int x, int y) {
 		switch (greenValue) {
-		case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
-		case PINKSTAR -> pinkstars.add(new Pinkstar(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
-		case SHARK -> sharks.add(new Shark(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
-		case 100 -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
+//		case CRABBY -> crabs.add(new Crabby(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
+//		case PINKSTAR -> pinkstars.add(new Pinkstar(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
+//		case SHARK -> sharks.add(new Shark(x * Game.TILES_SIZE, y * Game.TILES_SIZE));
+//		case 100 -> playerSpawn = new Point(x * Game.TILES_SIZE, y * Game.TILES_SIZE);
 		}
 	}
 
 	private void loadObjects(int blueValue, int x, int y) {
 		switch (blueValue) {
-		case RED_POTION, BLUE_POTION -> potions.add(new Potion(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
-		case BOX, BARREL -> containers.add(new GameContainer(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
-		case SPIKE -> spikes.add(new Spike(x * Game.TILES_SIZE, y * Game.TILES_SIZE, SPIKE));
-		case CANNON_LEFT, CANNON_RIGHT -> cannons.add(new Cannon(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
-		case TREE_ONE, TREE_TWO, TREE_THREE -> trees.add(new BackgroundTree(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+//		case RED_POTION, BLUE_POTION -> potions.add(new Potion(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+//		case BOX, BARREL -> containers.add(new GameContainer(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+//		case SPIKE -> spikes.add(new Spike(x * Game.TILES_SIZE, y * Game.TILES_SIZE, SPIKE));
+//		case CANNON_LEFT, CANNON_RIGHT -> cannons.add(new Cannon(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
+//		case TREE_ONE, TREE_TWO, TREE_THREE -> trees.add(new BackgroundTree(x * Game.TILES_SIZE, y * Game.TILES_SIZE, blueValue));
 		}
 	}
 
 	private void calcLvlOffsets() {
 		lvlTilesWide = img.getWidth();
-		maxTilesOffset = lvlTilesWide - Game.TILES_IN_WIDTH;
-		maxLvlOffsetX = Game.TILES_SIZE * maxTilesOffset;
+//		maxTilesOffset = lvlTilesWide - Game.TILES_IN_WIDTH;
+//		maxLvlOffsetX = Game.TILES_SIZE * maxTilesOffset;
 	}
 
 	public int getSpriteIndex(int x, int y) {
@@ -112,40 +97,13 @@ public class Level {
 		return playerSpawn;
 	}
 
-	public ArrayList<Crabby> getCrabs() {
-		return crabs;
-	}
 
-	public ArrayList<Shark> getSharks() {
-		return sharks;
-	}
-
-	public ArrayList<Potion> getPotions() {
-		return potions;
-	}
-
-	public ArrayList<GameContainer> getContainers() {
-		return containers;
-	}
-
-	public ArrayList<Spike> getSpikes() {
-		return spikes;
-	}
-
-	public ArrayList<Cannon> getCannons() {
-		return cannons;
-	}
-
-	public ArrayList<Pinkstar> getPinkstars() {
-		return pinkstars;
-	}
-
-	public ArrayList<BackgroundTree> getTrees() {
-		return trees;
-	}
-
-	public ArrayList<Grass> getGrass() {
-		return grass;
-	}
+//	public ArrayList<BackgroundTree> getTrees() {
+//		return trees;
+//	}
+//
+//	public ArrayList<Grass> getGrass() {
+//		return grass;
+//	}
 
 }
