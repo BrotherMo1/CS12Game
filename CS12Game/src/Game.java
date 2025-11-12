@@ -47,6 +47,9 @@ public class Game extends Canvas {
         private long firingInterval = 300; // interval between shots (ms)
         private long alienFiringInterval = 500;
         private int alienCount; // # of aliens left on screen
+        private long lastShiftTime = 0;
+        private final long SHIFT_DELAY = 250; // ms
+
 
         private String message = ""; // message to display while waiting
                                      // for a key press
@@ -384,35 +387,34 @@ public class Game extends Canvas {
 	
 	            // ship should not move without user input
 	            player.setHorizontalMovement(0);
-	            boolean playerPaused = false; 
-	            long pauseStartTime = System.currentTimeMillis();
-	            if (shifted & !playerPaused) {	 
-	            	pauseStartTime = System.currentTimeMillis();	        
-			              for (int i = 0; i < entities.size(); i++) {
-				                Entity entity = (Entity) entities.get(i);
-				                entity.move(0);
-				                player.setHorizontalMovement(0);
-				                player.setVerticalMovement(0);
-				              } // for
-
-		            	if (currentMap % 2 == 0) {
-		            		currentMap ++;
-		            	} else {
-		            		currentMap --;
-		            	}
-		            	loadMap(currentMap);
-		            	
-		            	shifted = false;
-
-	            } // if shifted
 	            
+	         // handle dimension shifting (map switching)
+	            if (shifted) {
+	                long currentTime = System.currentTimeMillis();
+
+	                // only allow shift if enough time passed since last one
+	                if (currentTime - lastShiftTime >= SHIFT_DELAY) {
+
+	                    // stop player movement briefly
+	                    player.setHorizontalMovement(0);
+	                    player.setVerticalMovement(0);
+
+	                    // toggle map
+	                    if (currentMap % 2 == 0) {
+	                        currentMap++;
+	                    } else {
+	                        currentMap--;
+	                    } // else
+
+	                    // reload map safely
+	                    loadMap(currentMap);
+
+	                    // reset flag and cooldown
+	                    shifted = false;
+	                    lastShiftTime = currentTime;
+	                } // if
+	            } // if shifted
             	
-//	            if (playerPaused) {	            	
-//		            if (System.currentTimeMillis() - playerPaused >= 250) {
-//		            	playerPaused = false;
-//		            } // if
-//	            } // if
-	
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
 	                player.setHorizontalMovement(-300); 
