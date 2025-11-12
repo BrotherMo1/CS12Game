@@ -20,9 +20,9 @@
     protected double dy; // vertical speed (px/s) + -> down
    
     
-    private Rectangle me = new Rectangle(); // bounding rectangle of
+    protected Rectangle me = new Rectangle(); // bounding rectangle of
                                             // this entity
-    private Rectangle him = new Rectangle(); // bounding rect. of other
+    protected Rectangle him = new Rectangle(); // bounding rect. of other
     
     
                                              // entities
@@ -57,6 +57,10 @@
      
      public void jump() {
     	 System.out.println("try jump");
+     }
+     
+     public boolean isOnGround() {
+    	 return true;
      }
 
      // get and set velocities

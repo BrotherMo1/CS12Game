@@ -18,7 +18,7 @@ public class Game extends Canvas {
         private boolean rightPressed = false; // true if right arrow key currently pressed
         private boolean firePressed = false; // true if firing
         private boolean upPressed = false;
-        private boolean pause = false;
+        private boolean paused = false;
         		
     	public final static int TILES_DEFAULT_SIZE = 32;
     	public static final float SCALE = 2f;
@@ -29,6 +29,8 @@ public class Game extends Canvas {
     	//TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
     	public final static int GAME_HEIGHT = 1000;
     	// TO MAKE HEIGHT SCALABLE: TILES_SIZE * TILES_IN_HEIGHT;
+    	
+
 
         
         private boolean gameRunning = true;
@@ -36,7 +38,7 @@ public class Game extends Canvas {
                                                       // in game
         private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
                                                             // to remove this loop
-        private Entity ship;  // the ship
+        private Entity player;  // the ship
         private double moveSpeed = 600; // hor. vel. of ship (px/s)
         private double yvel = 0;
         private long lastFire = 0; // time last shot fired
@@ -52,6 +54,12 @@ public class Game extends Canvas {
         private boolean logicRequiredThisLoop = false; // true if logic
                                                        // needs to be 
                                                        // applied this loop
+        
+        private boolean shifted = false;
+        
+        private ArrayList<Platform> platforms = new ArrayList<>();
+        private ArrayList<int[][]> maps = new ArrayList<>();
+        private int currentMap = 0;
 
     	/*
     	 * Construct our game and set it running.
@@ -64,11 +72,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(GAME_HEIGHT,GAME_WIDTH));
+    		panel.setPreferredSize(new Dimension(1000,1000));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,GAME_HEIGHT,GAME_WIDTH);
+    		setBounds(0,0,1000,1000);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -100,6 +108,9 @@ public class Game extends Canvas {
     
     		// initialize entities
     		initEntities();
+    		
+    		initMaps();
+    		loadMap(0);
     
     		// start the game
     		gameLoop();
@@ -114,8 +125,8 @@ public class Game extends Canvas {
     	 */
     	private void initEntities() {
               // create the ship and put in center of screen
-              ship = new ShipEntity(this, "sprites/ship1.png", 0, GAME_WIDTH - 50);
-              entities.add(ship);
+              player = new Player(this, "sprites/ship1.png", 50, 500);
+              entities.add(player);
     
               // create a block of aliens (5x12)
               alienCount = 0;
@@ -129,6 +140,78 @@ public class Game extends Canvas {
                 } // for
               } // outer for
     	} // initEntities
+    	
+    	private void loadMap(int index) {
+    		if (index < 0 || index >= maps.size()) {
+    			return;
+    		} // if
+    		platforms = makePlatforms(maps.get(index));
+     	}
+    	
+    	private void initMaps() {
+    		
+	    	
+    		//java 1D version
+    		int[][] map1=
+    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+	    	
+    		//java 1D version
+    		int[][] map2=
+    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,1,0,0,0,0,0,0},
+    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
+	    	
+	    	
+	    	maps.add(map1);
+	    	maps.add(map2);
+    	}
+
+        public ArrayList<Platform> makePlatforms(int[][] map) {
+        	ArrayList<Platform> platforms = new ArrayList<>();
+        	for (int row = 0; row < map.length; row++) {
+                for (int col = 0; col < map[row].length; col++) {
+                    if (map[row][col] == 1) {
+                        platforms.add(new Platform(
+                            col * TILES_SIZE, 
+                            row * TILES_SIZE, 
+                            TILES_SIZE, 
+                            TILES_SIZE
+                        ));
+                    }
+                }
+            }
+            return platforms;
+		} // makePlatforms
+        
+        public ArrayList<Platform> getPlatforms() {
+        	return platforms;
+        }
 
         /* Notification from a game entity that the logic of the game
          * should be run at the next opportunity 
@@ -190,7 +273,7 @@ public class Game extends Canvas {
           // otherwise add a shot
           lastFire = System.currentTimeMillis();
           ShotEntity shot = new ShotEntity(this, "sprites/shot.gif", 
-                            ship.getX() + 10, ship.getY() - 30);
+                            player.getX() + 10, player.getY() - 30);
           entities.add(shot);
         } // tryToFire
         
@@ -239,9 +322,9 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,GAME_HEIGHT,GAME_WIDTH);
+            g.fillRect(0,0,1000,1000);
             
-            if (!pause) {
+            if (!paused) {
 	            // move each entity
 	            if (!waitingForKeyPress) {
 	              for (int i = 0; i < entities.size(); i++) {
@@ -255,6 +338,8 @@ public class Game extends Canvas {
 	               Entity entity = (Entity) entities.get(i);
 	               entity.draw(g);
 	            } // for
+	            
+	            for (Platform platform : platforms) platform.draw(g);
 	
 	            // brute force collisions, compare every entity
 	            // against every other entity.  If any collisions
@@ -289,47 +374,47 @@ public class Game extends Canvas {
 	           // if waiting for "any key press", draw message
 	           if (waitingForKeyPress) {
 	             g.setColor(Color.white);
-	             g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message))/2, 250);
-	             g.drawString("Press any key", (GAME_HEIGHT - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
-	           	}  // if
+	             g.drawString(message, (1000 - g.getFontMetrics().stringWidth(message))/2, 250);
+	             g.drawString("Press any key", (1000 - g.getFontMetrics().stringWidth("Press any key"))/2, 300);
+	           }  // if
 	
 	            // clear graphics and flip buffer
 	            g.dispose();
 	            strategy.show();
 	
 	            // ship should not move without user input
-	            ship.setHorizontalMovement(0);
-	            ship.setVerticalMovement(0);
+	            player.setHorizontalMovement(0);
+	            
+	            if (shifted) {
+	            	if (currentMap % 2 == 0) {
+	            		currentMap ++;
+	            	} else {
+	            		currentMap --;
+	            	}
+	            	loadMap(currentMap);
+	            	
+	            	shifted = false;
+	            }
 	
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
-	              ship.setHorizontalMovement(-moveSpeed);
+	                player.setHorizontalMovement(-300); 
 	            } else if ((rightPressed) && (!leftPressed)) {
-	              ship.setHorizontalMovement(moveSpeed);
-	            } // else
+	                player.setHorizontalMovement(300);
+	            } else {
+	                player.setHorizontalMovement(0);
+	            }
+
+	            if (upPressed) {
+	                player.jump();
+	            }
 	            
 	            // if spacebar pressed, try to fire
-	            if (firePressed) {
+	            if (firePressed && player.isOnGround()) {
 	              tryToFire();
 	            } // if
 	            
-	            // gravity
-	            
-	            
-	            // jumping
-	            if (upPressed && ship.getY() >= GAME_WIDTH - 50) {
-	            	yvel = -GAME_HEIGHT;
-	            	ship.setVerticalMovement(yvel);
-
-	            }else if(ship.getY() <= GAME_WIDTH - 50 ) {
-	            	yvel += 50;
-	            	ship.setVerticalMovement(yvel);
-	            } else {
-	            	yvel = 0;
-	            }
-	            
-
-	            
+	           
 	            // pause
 	            try { Thread.sleep(10); } catch (Exception e) {}
             } // if
@@ -356,7 +441,7 @@ public class Game extends Canvas {
             rightPressed = false;
             firePressed = false;
             upPressed = false;
-            pause = false;
+            paused = false;
             
          } // startGame
 
@@ -364,96 +449,100 @@ public class Game extends Canvas {
         /* inner class KeyInputHandler
          * handles keyboard input from the user
          */
-	private class KeyInputHandler extends KeyAdapter {
+         private class KeyInputHandler extends KeyAdapter {
+             
+             private int pressCount = 1;  // the number of key presses since
+                                          // waiting for 'any' key press
+
+     	/* The following methods are required
+     	 * for any class that extends the abstract
+     	 * class KeyAdapter.  They handle keyPressed,
+     	 * keyReleased and keyTyped events.
+     	 */
+     		public void keyPressed(KeyEvent e) {
+
+                       // if waiting for keypress to start game, do nothing
+                       if (waitingForKeyPress) {
+                         return;
+                       } // if
+                       
+                       // respond to move left, right or fire
+                       if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
+                         leftPressed = true;
+                       } // if
+
+                       if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
+                         rightPressed = true;
+                       } // if
+                       
+                       if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
+                           upPressed = true;
+                         } // if
+                       
+                       if (e.getKeyCode() == KeyEvent.VK_P) {
+                     	  if (!paused)paused = true;
+                     	  else paused = false;
+                       } // if
+
+                       if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                         firePressed = true;
+                       } // if
+                       
+                       if(e.getKeyCode() == KeyEvent.VK_S) {
+                     	  shifted = !shifted;
+                       }
+
+     		} // keyPressed
+
+     		public void keyReleased(KeyEvent e) {
+                       // if waiting for keypress to start game, do nothing
+                       if (waitingForKeyPress) {
+                         return;
+                       } // if
+                       
+                       // respond to move left, right or fire
+                       if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
+                         leftPressed = false;
+                       } // if
+
+                       if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
+                         rightPressed = false;
+                       } // if
+                       
+                       if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
+                           upPressed = false;
+                         } // if
+
+                       if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                         firePressed = false;
+                       } // if
+                       
+                       
                  
-        private int pressCount = 1;  // the number of key presses since
-                                     // waiting for 'any' key press
 
-	/* The following methods are required
-	 * for any class that extends the abstract
-	 * class KeyAdapter.  They handle keyPressed,
-	 * keyReleased and keyTyped events.
-	 */
-		public void keyPressed(KeyEvent e) {
+     		} // keyReleased
 
-                  // if waiting for keypress to start game, do nothing
-                  if (waitingForKeyPress) {
-                    return;
-                  } // if
-                  
-                  // respond to move left, right or fire
-                  if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    leftPressed = true;
-                  } // if
+      	        public void keyTyped(KeyEvent e) {
 
-                  if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    rightPressed = true;
-                  } // if
+                        // if waiting for key press to start game
+      	           if (waitingForKeyPress) {
+                          if (pressCount == 1) {
+                            waitingForKeyPress = false;
+                            startGame();
+                            pressCount = 0;
+                          } else {
+                            pressCount++;
+                          } // else
+                        } // if waitingForKeyPress
 
-                  if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    firePressed = true;
-                  } // if
-                  
-                  if (e.getKeyCode() == KeyEvent.VK_UP) {
-                	  upPressed = true;
-                  }
-                  
-                  if (e.getKeyCode() == KeyEvent.VK_P) {
-                	  if(!pause) {
-                		  pause = true;
-                	  } else {
-                		  pause = false;
-                	  }
-                  }
+                        // if escape is pressed, end game
+                        if (e.getKeyChar() == 27) {
+                          System.exit(0);
+                        } // if escape pressed
 
-		} // keyPressed
+     		} // keyTyped
 
-		public void keyReleased(KeyEvent e) {
-                  // if waiting for keypress to start game, do nothing
-                  if (waitingForKeyPress) {
-                    return;
-                  } // if
-                  
-                  // respond to move left, right or fire
-                  if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                    leftPressed = false;
-                  } // if
-
-                  if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                    rightPressed = false;
-                  } // if
-
-                  if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    firePressed = false;
-                  } // if
-                  
-                  if (e.getKeyCode() == KeyEvent.VK_UP) {
-                	  upPressed = false;
-                  }
-
-		} // keyReleased
-
- 	        public void keyTyped(KeyEvent e) {
-
-                   // if waiting for key press to start game
- 	           if (waitingForKeyPress) {
-                     if (pressCount == 1) {
-                       waitingForKeyPress = false;
-                       startGame();
-                       pressCount = 0;
-                     } else {
-                       pressCount++;
-                     } // else
-                   } // if waitingForKeyPress
-
-                   // if escape is pressed, end game
-                   if (e.getKeyChar() == 27) {
-                     System.exit(0);
-                   } // if escape pressed
-
-		} // keyTyped
-
-	} // class KeyInputHandler
+     	} // class KeyInputHandler
 
 
 	/**

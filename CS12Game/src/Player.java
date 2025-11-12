@@ -4,7 +4,6 @@ public class Player extends Entity{
 	private Game game;
     private double dx = 0;        // Horizontal speed
     private double dy = 0;        // Vertical speed (gravity)
-    private boolean isJumping = false;   // Is the player currently jumping?
     private boolean onGround = true;    // Is the player on the ground or a platform?
     
     private static final double GRAVITY = 1500;  // The strength of gravity
@@ -13,6 +12,7 @@ public class Player extends Entity{
 	public Player(Game g, String r, int newX, int newY) {
 		super(r, newX, newY);
 		game = g;
+		me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -21,36 +21,74 @@ public class Player extends Entity{
 		
 	    if (!onGround) {
 	    	dy += GRAVITY * delta / 1000;
-	    }else {
+	    } else {
 	    	dy = 0;
 	    }
-	    this.setVerticalMovement(dy);
+	    x += (dx * delta) / 1000;
+	    me.setLocation((int)x, (int)y);
 	    
+	
+//		if (y > 950) {
+//			onGround = true;
+//			isJumping = false;
+//			y = 950;
+//		}
 		
-		super.move(delta);
-		if (y > 950) {
-			onGround = true;
-			isJumping = false;
-			y = 950;
-		}
+		// horizontal collisions 
+	    for (Platform platform : game.getPlatforms()) {
+	    	if (me.intersects(platform.hitBox)) {
+	    		if (dx > 0) { 
+	    			x = platform.x - me.width;
+	    		} else if (dx < 0) { 
+	    			x = platform.x + platform.width;
+	    		}
+	    		me.setLocation((int)x, (int)y);
+	            break;
+	          }
+	    }
+	    y += (dy * delta) / 1000;
+	    me.setLocation((int)x, (int)y);
+	      
+	    // vertical collisions
+	    onGround = false;
+	    for (Platform platform : game.getPlatforms()) {
+	    	if (me.intersects(platform.hitBox)) {
+	    		if (dy > 0) { 
+	    			y = platform.y - me.height;
+	    			dy = 0;
+	    			onGround = true;
+	    		} else if (dy < 0) {
+	    			y = platform.y + platform.height;
+	    			dy = 0;
+	    		}
+	    		me.setLocation((int)x, (int)y);
+	    		break;
+	    	}
+	    }
+	    
+	    me.setLocation((int)x, (int)y);
 	} // move
 	
+	public boolean isOnGround() {
+		  return onGround;
+	}
 
 	public void jump () {
 		System.out.println("test1");
-		System.out.println(isJumping);
+
 		System.out.println(onGround);
 		
 		
 		
-		if (!isJumping && onGround) {
-			isJumping = true;
+		if (onGround) {
 			onGround = false;
 			dy = JUMP_STRENGTH;
-			this.setVerticalMovement(dy);
 		}
 
 	} // jump
+	public void setHorizontalMovement(double dx) {
+	    this.dx = dx;
+	}
 	
 	// check if collisions;
 

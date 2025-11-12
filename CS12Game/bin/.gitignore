@@ -5,9 +5,13 @@
 /Game$KeyInputHandler.class
 /Game.class
 /Level.class
+/LevelEditor$1.class
+/LevelEditor$KeyInputHandler.class
+/LevelEditor.class
 /LevelManager.class
 /LoadSave.class
 /Main.class
+/Platform.class
 /Player.class
 /Playing.class
 /ShipEntity.class
