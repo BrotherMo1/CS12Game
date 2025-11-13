@@ -47,6 +47,9 @@ public class Game extends Canvas {
         private long firingInterval = 300; // interval between shots (ms)
         private long alienFiringInterval = 500;
         private int alienCount; // # of aliens left on screen
+        private long lastShiftTime = 0;
+        private final long SHIFT_DELAY = 250; // ms
+
 
         private String message = ""; // message to display while waiting
                                      // for a key press
@@ -55,7 +58,7 @@ public class Game extends Canvas {
                                                        // needs to be 
                                                        // applied this loop
         
-        private boolean shifted = false;
+        protected boolean shifted = false;
         
         private ArrayList<Platform> platforms = new ArrayList<>();
         private ArrayList<int[][]> maps = new ArrayList<>();
@@ -72,11 +75,11 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(GAME_HEIGHT,GAME_WIDTH));
+    		panel.setPreferredSize(new Dimension(GAME_WIDTH,GAME_HEIGHT));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
-    		setBounds(0,0,GAME_HEIGHT,GAME_WIDTH);
+    		setBounds(0,0,GAME_WIDTH,GAME_HEIGHT);
     		panel.add(this);
     
     		// Tell AWT not to bother repainting canvas since that will
@@ -322,7 +325,7 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.setColor(Color.black);
-            g.fillRect(0,0,GAME_HEIGHT,GAME_WIDTH);
+            g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
             
             if (!paused) {
 	            // move each entity
@@ -385,17 +388,32 @@ public class Game extends Canvas {
 	            // ship should not move without user input
 	            player.setHorizontalMovement(0);
 	            
+	         // handle dimension shifting (map switching)
 	            if (shifted) {
-	            	if (currentMap % 2 == 0) {
-	            		currentMap ++;
-	            	} else {
-	            		currentMap --;
-	            	}
-	            	loadMap(currentMap);
-	            	
-	            	shifted = false;
-	            }
-	
+	                long currentTime = System.currentTimeMillis();
+
+	                // only allow shift if enough time passed since last one
+	                if (currentTime - lastShiftTime >= SHIFT_DELAY) {
+
+	                    // stop player movement briefly
+	                    player.setHorizontalMovement(0);
+	                    player.setVerticalMovement(0);
+
+	                    // toggle map
+	                    if (currentMap % 2 == 0) {
+	                        currentMap++;
+	                    } else {
+	                        currentMap--;
+	                    } // else
+
+	                    loadMap(currentMap);
+
+	                    // reset shifted and cooldown
+	                    shifted = false;
+	                    lastShiftTime = currentTime;
+	                } // if
+	            } // if shifted
+            	
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
 	                player.setHorizontalMovement(-300); 
