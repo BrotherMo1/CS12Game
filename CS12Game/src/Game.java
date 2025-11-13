@@ -55,7 +55,11 @@ public class Game extends Canvas {
         private long alienFiringInterval = 500;
         private int alienCount; // # of aliens left on screen
         private long lastShiftTime = 0;
-    private final long SHIFT_DELAY = 250; // ms
+        private final long SHIFT_DELAY = 250; // ms
+        private boolean shifting = false;
+        private long shiftStartTime = 0;
+        private static final long SHIFT_DURATION = 1000; // 1 second per phase
+        private int shiftPhase = 0; // 0 = not shifting, 1 = pre-shift pause, 2 = post-shift pause
 
 
         private String message = ""; // message to display while waiting
@@ -206,7 +210,7 @@ public class Game extends Canvas {
     			{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
     		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
     		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -415,29 +419,45 @@ public class Game extends Canvas {
 	            // ship should not move without user input
 	            player.setHorizontalMovement(0);
 	            
-	         // handle dimension shifting (map switching)
-	            if (shifted) {
+	            // handle dimension shifting (map switching)
+	            if (shifted && !shifting) {
 	                long currentTime = System.currentTimeMillis();
 
 	                // only allow shift if enough time passed since last one
 	                if (currentTime - lastShiftTime >= SHIFT_DELAY) {
 
-	                    // stop player movement briefly
-	  	              for (int i = 0; i < entities.size(); i++) {
-	  	                Entity entity = (Entity) entities.get(i);
-	  	                entity.move(0);
+	                    shifting = true;
+	                    shiftStartTime = currentTime;
+	                    shiftPhase = 1;
+
 	                    player.setHorizontalMovement(0);
 	                    player.setVerticalMovement(0);
-	  	              } // for	  	           
 	                    
-	                    // toggle map
-	                    if (currentMap % 2 == 0) {
-	                        currentMap++;
-	                    } else {
-	                        currentMap--;
-	                    } // else
+	                    shifted = false;
+	                }
+	            }
+	            if (shifting) {
+	            	long currentTime = System.currentTimeMillis();
+	            	long elapsed = currentTime - shiftStartTime;
+	            	
+	            	if (shiftPhase == 1) {
+	            		player.setHorizontalMovement(0);
+	                    player.setVerticalMovement(0);
+	                    
+	                    if (elapsed >= SHIFT_DURATION) {
+	                    	// toggle map
+		                    if (currentMap % 2 == 0) {
+		                        currentMap++;
+		                    } else {
+		                        currentMap--;
+		                    } // else
+		                    
+		                    
+	                    }
+	            	
+	                    
 
-	                    loadMap(currentMap);
+	                    
 
 	                    // reset shifted and cooldown
 	                    shifted = false;

@@ -74,12 +74,6 @@ public class Player extends Entity{
 	}
 
 	public void jump () {
-		System.out.println("test1");
-
-		System.out.println(onGround);
-		
-		
-		
 		if (onGround) {
 			onGround = false;
 			dy = JUMP_STRENGTH;
@@ -89,6 +83,10 @@ public class Player extends Entity{
 	public void setHorizontalMovement(double dx) {
 	    this.dx = dx;
 	}
+	
+	public void setVerticalMovement(double newDY) {
+	       dy = newDY;
+	} // setVerticalMovement
 	
 	// check if collisions;
 
