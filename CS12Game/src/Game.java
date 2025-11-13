@@ -1,3 +1,5 @@
+
+
 /* Game.java
  * Space Invaders Main Program
  *
@@ -26,11 +28,16 @@ public class Game extends Canvas {
     	public final static int TILES_IN_HEIGHT = 14;
     	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
     	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-    	// TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
+    	//TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
     	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
     	// TO MAKE HEIGHT SCALABLE: TILES_SIZE * TILES_IN_HEIGHT;
     	
-
+    	private int xLvlOffset;
+    	private int leftBorder = (int)(0.2 * GAME_WIDTH);
+    	private int rightBorder = (int) (0.8 * GAME_WIDTH);
+    	private int lvlTilesWide = 0; 
+    	private int maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
+    	private int maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
 
         
         private boolean gameRunning = true;
@@ -48,7 +55,7 @@ public class Game extends Canvas {
         private long alienFiringInterval = 500;
         private int alienCount; // # of aliens left on screen
         private long lastShiftTime = 0;
-        private final long SHIFT_DELAY = 250; // ms
+    private final long SHIFT_DELAY = 250; // ms
 
 
         private String message = ""; // message to display while waiting
@@ -58,7 +65,7 @@ public class Game extends Canvas {
                                                        // needs to be 
                                                        // applied this loop
         
-        protected boolean shifted = false;
+        private boolean shifted = false;
         
         private ArrayList<Platform> platforms = new ArrayList<>();
         private ArrayList<int[][]> maps = new ArrayList<>();
@@ -75,7 +82,7 @@ public class Game extends Canvas {
     		JPanel panel = (JPanel) container.getContentPane();
     
     		// set up the resolution of the game
-    		panel.setPreferredSize(new Dimension(GAME_WIDTH,GAME_HEIGHT));
+    		panel.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
     		panel.setLayout(null);
     
     		// set up canvas size (this) and add to frame
@@ -114,6 +121,9 @@ public class Game extends Canvas {
     		
     		initMaps();
     		loadMap(0);
+    		lvlTilesWide = getMapWidth(currentMap);
+    		maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
+        	maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
     
     		// start the game
     		gameLoop();
@@ -144,6 +154,13 @@ public class Game extends Canvas {
               } // outer for
     	} // initEntities
     	
+    	private int getMapWidth(int index) {
+    		if (index < 0 || index >= maps.size()) {
+    			return 0;
+    		} // if
+    		return maps.get(index)[0].length;
+    	}
+    	
     	private void loadMap(int index) {
     		if (index < 0 || index >= maps.size()) {
     			return;
@@ -151,47 +168,55 @@ public class Game extends Canvas {
     		platforms = makePlatforms(maps.get(index));
      	}
     	
+    	private void checkCloseToBorder() {
+    		int playerX = player.getX();
+    		int diff = playerX - xLvlOffset;
+    		
+    		if (diff > rightBorder) {
+    			xLvlOffset += diff - rightBorder;
+    		} else if (diff < leftBorder) {
+    			xLvlOffset += diff - leftBorder;
+    		}
+    		
+    		if (xLvlOffset > maxLvlOffsetX) {
+    			xLvlOffset = maxLvlOffsetX;
+    		} else if (xLvlOffset < 0){
+    			xLvlOffset = 0;
+    		}
+    	}
+    	
     	private void initMaps() {
     		
 	    	
     		//java 1D version
-    		//java 1D version
-    		int[][] lvl1=
-    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+    		int[][] map1=
+	    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
+	    		{0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
+	    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+	    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 	    	
     		//java 1D version
-    		int[][] shift1=
-    		{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
-    		{0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+    		int[][] map2=
+    			{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    		    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    		   	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+    		   	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    		   	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 	    	
 	    	
-	    	maps.add(lvl1);
-	    	maps.add(shift1);
+	    	maps.add(map1);
+	    	maps.add(map2);
     	}
 
         public ArrayList<Platform> makePlatforms(int[][] map) {
@@ -214,6 +239,7 @@ public class Game extends Canvas {
         public ArrayList<Platform> getPlatforms() {
         	return platforms;
         }
+
 
         /* Notification from a game entity that the logic of the game
          * should be run at the next opportunity 
@@ -334,14 +360,16 @@ public class Game extends Canvas {
 	                entity.move(delta);
 	              } // for
 	            } // if
-	
+	            
+	            checkCloseToBorder();
+	            
 	            // draw all entities
 	            for (int i = 0; i < entities.size(); i++) {
 	               Entity entity = (Entity) entities.get(i);
-	               entity.draw(g);
+	               entity.draw(g, xLvlOffset);
 	            } // for
 	            
-	            for (Platform platform : platforms) platform.draw(g);
+	            for (Platform platform : platforms) platform.draw(g, xLvlOffset);
 	
 	            // brute force collisions, compare every entity
 	            // against every other entity.  If any collisions

@@ -21,11 +21,11 @@ public class Platform {
 		hitBox = new Rectangle(x, y, TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE);
 	} // Platform
 	
-	public void draw(Graphics2D gtd) {
+	public void draw(Graphics2D gtd, int xLvlOffset) {
 		 gtd.setColor(Color.GREEN);
-	     gtd.fillRect(x, y, width, height);
+	     gtd.fillRect(x - xLvlOffset, y, width, height);
 	     gtd.setColor(Color.DARK_GRAY);
-	     gtd.drawRect(x, y, width, height);
+	     gtd.drawRect(x - xLvlOffset, y, width, height);
 	} // draw
 	
 	 public int getX() { return x; }
