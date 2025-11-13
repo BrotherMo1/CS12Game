@@ -5,6 +5,7 @@ public class Player extends Entity{
     private double dx = 0;        // Horizontal speed
     private double dy = 0;        // Vertical speed (gravity)
     private boolean onGround = true;    // Is the player on the ground or a platform?
+
     
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
@@ -63,8 +64,8 @@ public class Player extends Entity{
 	    		}
 	    		me.setLocation((int)x, (int)y);
 	    		break;
-	    	}
-	    }
+	    	} // if
+	    } // for
 	    
 	    me.setLocation((int)x, (int)y);
 	} // move
