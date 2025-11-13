@@ -1,3 +1,4 @@
+/sprites/
 /AlienEntity.class
 /AlienShotEntity.class
 /Entity.class
@@ -18,5 +19,3 @@
 /ShotEntity.class
 /Sprite.class
 /SpriteStore.class
-/sprites/
-/.gitignore
