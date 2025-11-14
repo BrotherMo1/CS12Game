@@ -484,32 +484,38 @@ public class Game extends Canvas {
                        if (waitingForKeyPress) {
                          return;
                        } // if
+                       if(e.getKeyCode() == KeyEvent.VK_S) {
+                      	  shifted = !shifted;
+                        }
                        
-                       // respond to move left, right or fire
-                       if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-                         leftPressed = true;
-                       } // if
+                       if (shifted == false) {
+                    	   
+                           // respond to move left, right or fire
+                           if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
+                             leftPressed = true;
+                           } // if
 
-                       if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-                         rightPressed = true;
-                       } // if
-                       
-                       if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
-                           upPressed = true;
-                         } // if
-                       
+                           if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
+                             rightPressed = true;
+                           } // if
+                           
+                           if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
+                               upPressed = true;
+                             } // if
+                                            	   
+                           if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                               firePressed = true;
+                             } // if
+                       } // if shifted
+
                        if (e.getKeyCode() == KeyEvent.VK_P) {
                      	  if (!paused)paused = true;
                      	  else paused = false;
                        } // if
 
-                       if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                         firePressed = true;
-                       } // if
+
                        
-                       if(e.getKeyCode() == KeyEvent.VK_S) {
-                     	  shifted = !shifted;
-                       }
+
 
      		} // keyPressed
 

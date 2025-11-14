@@ -18,5 +18,10 @@
 /ShotEntity.class
 /Sprite.class
 /SpriteStore.class
+<<<<<<< Updated upstream
 /sprites/
 /.gitignore
+=======
+/Game$MouseInputHandler.class
+/Button.class
+>>>>>>> Stashed changes
