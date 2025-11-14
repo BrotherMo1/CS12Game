@@ -23,7 +23,7 @@ public class Game extends Canvas {
         private boolean paused = false;
         		
     	public final static int TILES_DEFAULT_SIZE = 32;
-    	public static final float SCALE = 1.75f;
+    	public static final float SCALE = 2f;
     	public final static int TILES_IN_WIDTH = 26;
     	public final static int TILES_IN_HEIGHT = 14;
     	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
@@ -554,8 +554,7 @@ private void startMenu() {
 	            if (firePressed && player.isOnGround()) {
 	              tryToFire();
 	            } // if
-	            
-	           
+
 	            // pause
 	            try { Thread.sleep(10); } catch (Exception e) {}
             } else {
@@ -568,9 +567,7 @@ private void startMenu() {
           	  g.setColor(Color.WHITE);
           	  g.setFont(new Font("Arial", Font.BOLD, 40));
           	  g.drawString("Game Paused", (1000 - g.getFontMetrics().stringWidth("Game Paused"))/2 + 100, 100);
-          	  
-          	 
-          			  
+		  
           	  for (int i = 0; i < entities.size(); i++) {
    	               Entity entity = (Entity) entities.get(i);
    	               entity.draw(g, xLvlOffset);
@@ -588,15 +585,11 @@ private void startMenu() {
                		  quitButton.draw(g);
                	   } // else
               } // if
-   	        	  
-   	        	  
-   	        	  
+   	        	    	        	  
           	  g.dispose();
   	          strategy.show();
   	          
             } // else
-	            
-
           } // while
 
 	} // gameLoop
@@ -643,31 +636,34 @@ private void startMenu() {
                          return;
                        } // if
                        
-                       // respond to move left, right or fire
-                       if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
-                         leftPressed = true;
-                       } // if
+                       if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
+                      	  shifted = !shifted;
+                        }
+                       
+                       if (shifted == false) {
+                    	   
+                           // respond to move left, right or fire
+                           if (e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_A) {
+                             leftPressed = true;
+                           } // if
 
-                       if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
-                         rightPressed = true;
-                       } // if
-                       
-                       if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
-                           upPressed = true;
-                         } // if
-                       
+                           if (e.getKeyCode() == KeyEvent.VK_RIGHT || e.getKeyCode() == KeyEvent.VK_D) {
+                             rightPressed = true;
+                           } // if
+                           
+                           if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
+                               upPressed = true;
+                             } // if
+                           
+                           if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                               firePressed = true;
+                             } // if
+                       }
+                     
                        if (e.getKeyCode() == KeyEvent.VK_P) {
                      	  if (!paused)paused = true;
                      	  else paused = false;
                        } // if
-
-                       if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                         firePressed = true;
-                       } // if
-                       
-                       if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
-                     	  shifted = !shifted;
-                       }
 
      		} // keyPressed
 
