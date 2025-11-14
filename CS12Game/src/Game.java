@@ -40,7 +40,7 @@ public class Game extends Canvas {
     	private int maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
 
         
-        private boolean gameRunning = true;
+        private boolean gameRunning = false;
         private ArrayList <Entity> entities = new ArrayList<Entity>(); // list of entities
                                                       // in game
         private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
@@ -467,47 +467,76 @@ private void startMenu() {
 	            // ship should not move without user input
 	            player.setHorizontalMovement(0);
 	            
-	            // handle dimension shifting (map switching)
-	            if (shifted && !shifting) {
+	            // Evan's attempt at SHIFT DELAY
+//	            // handle dimension shifting (map switching)
+//	            if (shifted && !shifting) {
+//	                long currentTime = System.currentTimeMillis();
+//
+//	                // only allow shift if enough time passed since last one
+//	                if (currentTime - lastShiftTime >= SHIFT_DELAY) {
+//
+//	                    shifting = true;
+//	                    shiftStartTime = currentTime;
+//	                    shiftPhase = 1;
+//
+//	                    player.setHorizontalMovement(0);
+//	                    player.setVerticalMovement(0);
+//	                    
+//	                    shifted = false;
+//	                }
+//	            }
+//	            if (shifting) {
+//	            	long currentTime = System.currentTimeMillis();
+//	            	long elapsed = currentTime - shiftStartTime;
+//	            	
+//	            	if (shiftPhase == 1) {
+//	            		player.setHorizontalMovement(0);
+//	                    player.setVerticalMovement(0);
+//	                    
+//	                    if (elapsed >= SHIFT_DURATION) {
+//	                    	// toggle map
+//		                    if (currentMap % 2 == 0) {
+//		                        currentMap++;
+//		                    } else {
+//		                        currentMap--;
+//		                    } // else
+//		                    	                    
+//	                    }
+//
+//	                    // reset shifted and cooldown
+//	                    shifted = false;
+//	                    lastShiftTime = currentTime;
+//	                } // if
+//	            } // if shifted
+	            
+	            // MO's attempt at shift delay
+		         // handle dimension shifting (map switching)
+	            if (shifted) {
 	                long currentTime = System.currentTimeMillis();
 
 	                // only allow shift if enough time passed since last one
 	                if (currentTime - lastShiftTime >= SHIFT_DELAY) {
 
-	                    shifting = true;
-	                    shiftStartTime = currentTime;
-	                    shiftPhase = 1;
-
+	                    // stop player movement briefly
 	                    player.setHorizontalMovement(0);
 	                    player.setVerticalMovement(0);
-	                    
-	                    shifted = false;
-	                }
-	            }
-	            if (shifting) {
-	            	long currentTime = System.currentTimeMillis();
-	            	long elapsed = currentTime - shiftStartTime;
-	            	
-	            	if (shiftPhase == 1) {
-	            		player.setHorizontalMovement(0);
-	                    player.setVerticalMovement(0);
-	                    
-	                    if (elapsed >= SHIFT_DURATION) {
-	                    	// toggle map
-		                    if (currentMap % 2 == 0) {
-		                        currentMap++;
-		                    } else {
-		                        currentMap--;
-		                    } // else
-		                    	                    
-	                    }
 
-	                    // reset shifted and cooldown
+	                    // toggle map
+	                    if (currentMap % 2 == 0) {
+	                        currentMap++;
+	                    } else {
+	                        currentMap--;
+	                    } // else
+
+	                    // reload map safely
+	                    loadMap(currentMap);
+
+	                    // reset flag and cooldown
 	                    shifted = false;
 	                    lastShiftTime = currentTime;
 	                } // if
 	            } // if shifted
-            	
+	            
 	            // respond to user moving ship
 	            if ((leftPressed) && (!rightPressed)) {
 	                player.setHorizontalMovement(-300); 
@@ -636,7 +665,7 @@ private void startMenu() {
                          firePressed = true;
                        } // if
                        
-                       if(e.getKeyCode() == KeyEvent.VK_S) {
+                       if(e.getKeyCode() == KeyEvent.VK_SHIFT) {
                      	  shifted = !shifted;
                        }
 
