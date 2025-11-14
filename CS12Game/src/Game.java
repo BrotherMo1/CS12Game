@@ -23,7 +23,7 @@ public class Game extends Canvas {
         private boolean paused = false;
         		
     	public final static int TILES_DEFAULT_SIZE = 32;
-    	public static final float SCALE = 2f;
+    	public static final float SCALE = 1.75f;
     	public final static int TILES_IN_WIDTH = 26;
     	public final static int TILES_IN_HEIGHT = 14;
     	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
@@ -74,7 +74,17 @@ public class Game extends Canvas {
         private ArrayList<Platform> platforms = new ArrayList<>();
         private ArrayList<int[][]> maps = new ArrayList<>();
         private int currentMap = 0;
-
+        private boolean playing = false;
+        
+        private MouseInputHandler mouseInputs = new MouseInputHandler();
+        
+        private ArrayList<Button> buttons = new ArrayList<>();
+        
+        private PointerInfo pointerInfo = MouseInfo.getPointerInfo();
+        
+        private Button quitButton;
+        
+        
     	/*
     	 * Construct our game and set it running.
     	 */
@@ -113,6 +123,10 @@ public class Game extends Canvas {
     		// add key listener to this canvas
     		addKeyListener(new KeyInputHandler());
     
+    		// add mouse listener to canvas
+    		addMouseListener(mouseInputs);
+    		addMouseMotionListener(mouseInputs);
+    		
     		// request focus so key events are handled by this canvas
     		requestFocus();
 
@@ -120,20 +134,55 @@ public class Game extends Canvas {
     		createBufferStrategy(2);
     		strategy = getBufferStrategy();
     
-    		// initialize entities
-    		initEntities();
-    		
-    		initMaps();
-    		loadMap(0);
-    		lvlTilesWide = getMapWidth(currentMap);
-    		maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
-        	maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
-    
-    		// start the game
-    		gameLoop();
+    		while(true) {
+    			startMenu();
+    			
+    			if(playing) {
+    				
+    				initEntities();
+    				initMaps();
+    	    		loadMap(0);
+    	    		lvlTilesWide = getMapWidth(currentMap);
+    	    		maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
+    	        	maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
+    	    
+    	    		// start the game
+    	    		gameLoop();
+    			} // if
+    		} // while
+    			   
+
         } // constructor
     
+// create startMenu
+private void startMenu() {
+	
+	Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
     
+	(SpriteStore.get()).getSprite("sprites/background_menu.png").draw(g, 0, 0);
+    
+    Button startButton = new Button("sprites/playButton.png", "sprites/playButtonHover.png", 50, 400);
+    quitButton = new Button("sprites/quitButton.png", "sprites/quitButtonHover.png", 50, 550);
+   
+   buttons.add(startButton);
+   buttons.add(quitButton);
+   
+   if (pointerInfo != null) {
+	   pointerInfo = MouseInfo.getPointerInfo();
+       Point p = pointerInfo.getLocation();
+       for(Button b : buttons) {
+    	   if (b.isHovered(p.x, p.y)) {
+    		   b.drawHovered(g);
+    	   } else {
+    		   b.draw(g);
+    	   } // else
+       } // for
+   } // if
+                      
+    strategy.show();
+	
+} // startMenu
+
         /* initEntities
          * input: none
          * output: none
@@ -353,8 +402,7 @@ public class Game extends Canvas {
 
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-            g.setColor(Color.black);
-            g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+            (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
             
             if (!paused) {
 	            // move each entity
@@ -451,13 +499,8 @@ public class Game extends Canvas {
 		                    } else {
 		                        currentMap--;
 		                    } // else
-		                    
-		                    
+		                    	                    
 	                    }
-	            	
-	                    
-
-	                    
 
 	                    // reset shifted and cooldown
 	                    shifted = false;
@@ -486,7 +529,43 @@ public class Game extends Canvas {
 	           
 	            // pause
 	            try { Thread.sleep(10); } catch (Exception e) {}
-            } // if
+            } else {
+          	  AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+          	  g.setComposite(alphaComposite);
+          	  g.setColor(new Color(0,0,0, 255));
+          	  g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+          	  g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+
+          	  g.setColor(Color.WHITE);
+          	  g.setFont(new Font("Arial", Font.BOLD, 40));
+          	  g.drawString("Game Paused", (1000 - g.getFontMetrics().stringWidth("Game Paused"))/2 + 100, 100);
+          	  
+          	 
+          			  
+          	  for (int i = 0; i < entities.size(); i++) {
+   	               Entity entity = (Entity) entities.get(i);
+   	               entity.draw(g, xLvlOffset);
+   	          } // for
+   	        
+   	         for (Platform platform : platforms) platform.draw(g, xLvlOffset);
+   	         
+   	         
+   	        if (pointerInfo != null) {
+   	        	pointerInfo = MouseInfo.getPointerInfo();
+                  Point p = pointerInfo.getLocation();
+               	   if (quitButton.isHovered(p.x, p.y)) {
+               		  quitButton.drawHovered(g);
+               	   } else {
+               		  quitButton.draw(g);
+               	   } // else
+              } // if
+   	        	  
+   	        	  
+   	        	  
+          	  g.dispose();
+  	          strategy.show();
+  	          
+            } // else
 	            
 
           } // while
@@ -613,6 +692,59 @@ public class Game extends Canvas {
 
      	} // class KeyInputHandler
 
+         private class MouseInputHandler implements MouseListener, MouseMotionListener {
+        	 
+         	public void mouseClicked(MouseEvent e) {
+         		for (Button mb : buttons) {
+ 					if (isIn(e, mb)) {
+ 						
+ 						if(mb.getButtonType().equals("sprites/playButton.png")) {
+ 							playing = true;
+ 							gameRunning = true;
+ 							break;
+ 						} else if(mb.getButtonType().equals("sprites/quitButton.png")) {
+ 								if (!gameRunning && !playing) {
+ 									System.exit(0);
+ 									break;
+ 								} else if (gameRunning) {
+ 									gameRunning = false;
+ 									playing = false;
+ 									paused = false;
+ 									break;
+ 								}
+ 								
+ 						} // else if  
+ 					} // if
+ 				} // for
+         		
+         	} // mouseClicked
+
+ 			@Override
+ 			public void mouseDragged(MouseEvent e) {} // mouseDragged
+
+ 			@Override
+ 			public void mouseMoved(MouseEvent e) {} // mouseMoved
+
+ 			@Override
+ 			public void mousePressed(MouseEvent e) {} // mousePressed
+
+ 			@Override
+ 			public void mouseReleased(MouseEvent e) {} // mouseReleased
+
+ 			@Override
+ 			public void mouseEntered(MouseEvent e) {} // mouseEntered
+
+ 			@Override
+ 			public void mouseExited(MouseEvent e) {} // mouseExited
+         	 
+         	 
+          } // MouseInputs
+          
+          public boolean isIn(MouseEvent e, Button mb) {
+      		return mb.getBounds().contains(e.getX(), e.getY());
+      	 } // isIn
+
+         
 
 	/**
 	 * Main Program
