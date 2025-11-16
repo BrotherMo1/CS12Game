@@ -1,3 +1,4 @@
+import main.Game;
 
 public class Player extends Entity{
 	
@@ -5,13 +6,20 @@ public class Player extends Entity{
     private double dx = 0;        // Horizontal speed
     private double dy = 0;        // Vertical speed (gravity)
     private boolean onGround = true;    // Is the player on the ground or a platform?
-    
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
+    
+	private int healthBarWidth = (int) (150 * Game.SCALE);
+	private int healthBarHeight = (int) (4 * Game.SCALE);
+	private int healthBarXStart = (int) (34 * Game.SCALE);
+	private int healthBarYStart = (int) (14 * Game.SCALE);
+	private int healthWidth = healthBarWidth;
 
 	public Player(Game g, String r, int newX, int newY) {
-		super(r, newX, newY);
+		super(r, newX, newY);		
 		game = g;
+		this.maxHealth = 100;
+		this.currentHealth = maxHealth;
 		me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
 		// TODO Auto-generated constructor stub
 	}
