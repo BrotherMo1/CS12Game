@@ -24,7 +24,9 @@ public class Player extends Entity{
 	
 
 	public void move (long delta){
-		
+		if (game.isShifting()) {
+            return;
+        }
 	        
 	    if (!onGround) {
 	    	dy += GRAVITY * delta / 1000;

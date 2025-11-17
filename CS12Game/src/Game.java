@@ -204,6 +204,10 @@ public class Game extends Canvas {
             } // for
         } // outer for
     } // initEntities
+    
+    public boolean isShifting() {
+    	return shifting;
+    }
 
     private int getMapWidth(int index) {
         if (index < 0 || index >= maps.size()) {
@@ -472,6 +476,7 @@ public class Game extends Canvas {
             // entities movement
             long delta = System.currentTimeMillis() - lastLoopTime;
             lastLoopTime = System.currentTimeMillis();
+            long currentTime = System.currentTimeMillis();
 
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
@@ -540,7 +545,7 @@ public class Game extends Canvas {
                 // ship should not move without user input
                 player.setHorizontalMovement(0);
                 
-                long currentTime = System.currentTimeMillis();
+                
                 if (shifted && !shifting) {
 
 
@@ -566,8 +571,7 @@ public class Game extends Canvas {
                         } // else
                         loadMap(currentMap);
                         shifted = false;
-                    }
-                    if (elapsed >= SHIFT_DURATION * 2) {
+                    } if (elapsed >= SHIFT_DURATION * 2) {
                         shifting = false;
                         lastShiftTime = currentTime;
                     }
