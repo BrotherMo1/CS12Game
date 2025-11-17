@@ -782,6 +782,7 @@ public class Game extends Canvas {
                             gameRunning = false;
                             playing = false;
                             paused = false;
+                            entities.clear();
                             break;
                         }
 
