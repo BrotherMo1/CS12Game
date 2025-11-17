@@ -38,6 +38,12 @@ public class Player extends Entity{
 	    
 //		if (game.isShifting()) return;
 		
+	    for (Spike spike : game.getSpikes()) {
+	    	if (me.intersects(spike.hitBox)) {
+	    		game.notifyDeath();
+	    	}
+	    }
+	    
 		// horizontal collisions 
 	    for (Platform platform : game.getPlatforms()) {
 	    	if (me.intersects(platform.hitBox)) {

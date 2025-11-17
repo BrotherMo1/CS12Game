@@ -70,6 +70,7 @@ public class Game extends Canvas {
     private boolean shifted = false;
 
     private ArrayList < Platform > platforms = new ArrayList < > ();
+    private ArrayList < Spike > spikes = new ArrayList < > ();
     private ArrayList < int[][] > maps = new ArrayList < > ();
     private int currentMap = 0;
     private boolean playing = false;
@@ -221,6 +222,7 @@ public class Game extends Canvas {
             return;
         } // if
         platforms = makePlatforms(maps.get(index));
+        spikes = makeSpikes(maps.get(index));
     }
 
     private void checkCloseToBorder() {
@@ -279,7 +281,7 @@ public class Game extends Canvas {
     		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
     		{1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
     		{1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
-    		{1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
+    		{1,0,0,0,0,2,2,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
     		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 			
@@ -292,7 +294,7 @@ public class Game extends Canvas {
 		    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		    {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,2,1},
 		    {1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,2,1},
-		   	{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,2,1},
+		   	{1,0,0,0,0,0,0,0,2,2,1,0,0,0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,2,1},
 		   	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 		   	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
     	
@@ -325,6 +327,25 @@ public class Game extends Canvas {
         }
         return platforms;
     } // makePlatforms
+    
+    public ArrayList < Spike > makeSpikes(int[][] map) {
+        ArrayList < Spike > spikes = new ArrayList < > ();
+        for (int row = 0; row < map.length; row++) {
+            for (int col = 0; col < map[row].length; col++) {
+                if (map[row][col] == 2) {
+                    spikes.add(new Spike(
+                        col * TILES_SIZE,
+                        row * TILES_SIZE,
+                        TILES_SIZE,
+                        TILES_SIZE
+                    ));
+                }
+            }
+        }
+        return spikes;
+    } // makeSpikes
+    
+    
 
 
     private boolean checkLevelEnd() {
@@ -368,6 +389,10 @@ public class Game extends Canvas {
 
     public ArrayList < Platform > getPlatforms() {
         return platforms;
+    }
+    
+    public ArrayList < Spike > getSpikes(){
+    	return spikes;
     }
 
 
@@ -499,7 +524,8 @@ public class Game extends Canvas {
                     entity.draw(g, xLvlOffset);
                 } // for
 
-                for (Platform platform: platforms) platform.draw(g, xLvlOffset);
+                for (Platform platform : platforms) platform.draw(g, xLvlOffset);
+                for (Spike spike : spikes) spike.draw(g, xLvlOffset);
 
                 // brute force collisions, compare every entity
                 // against every other entity.  If any collisions
@@ -562,7 +588,6 @@ public class Game extends Canvas {
 
                     long elapsed = currentTime - shiftStartTime;
                     if (elapsed >= SHIFT_DURATION && shifted) {
-                        System.out.println("test");
                         // toggle map
                         if (currentMap % 2 == 0) {
                             currentMap++;
@@ -621,7 +646,7 @@ public class Game extends Canvas {
                 } // for
 
                 for (Platform platform: platforms) platform.draw(g, xLvlOffset);
-
+                for (Spike spike: spikes) spike.draw(g, xLvlOffset);
 
                 if (pointerInfo != null) {
                     pointerInfo = MouseInfo.getPointerInfo();
