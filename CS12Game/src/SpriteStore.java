@@ -38,7 +38,7 @@
         return (Sprite) sprites.get(ref);
       } // if
       
-      // else, load the inmage into the HashMap off the 
+      // else, load the image into the HashMap off the 
       // hard drive (and hence, into memory)
       
       BufferedImage sourceImage = null;

@@ -1,5 +1,3 @@
-import main.Game;
-
 public class Player extends Entity{
 	
 	private Game game;
@@ -27,6 +25,7 @@ public class Player extends Entity{
 
 	public void move (long delta){
 		
+	        
 	    if (!onGround) {
 	    	dy += GRAVITY * delta / 1000;
 	    } else {
@@ -35,12 +34,7 @@ public class Player extends Entity{
 	    x += (dx * delta) / 1000;
 	    me.setLocation((int)x, (int)y);
 	    
-	
-//		if (y > 950) {
-//			onGround = true;
-//			isJumping = false;
-//			y = 950;
-//		}
+//		if (game.isShifting()) return;
 		
 		// horizontal collisions 
 	    for (Platform platform : game.getPlatforms()) {
@@ -88,6 +82,8 @@ public class Player extends Entity{
 		}
 
 	} // jump
+	
+	
 	public void setHorizontalMovement(double dx) {
 	    this.dx = dx;
 	}
