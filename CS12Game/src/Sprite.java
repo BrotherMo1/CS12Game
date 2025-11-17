@@ -31,5 +31,9 @@
    public void draw(Graphics g, int x, int y) {
       g.drawImage(image, x, y, null);
    } // draw
+   
+   public Image getImage() {
+	   return image;
+   }
 
  } // Sprite

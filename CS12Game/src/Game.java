@@ -53,10 +53,10 @@ public class Game extends Canvas {
     private long alienFiringInterval = 500;
     private int alienCount; // # of aliens left on screen
     private long lastShiftTime = 0;
-    private final long SHIFT_DELAY = 250; // ms
+    private final long SHIFT_DELAY = 1000; // ms
     private boolean shifting = false;
     private long shiftStartTime = 0;
-    private static final long SHIFT_DURATION = 1000; // 1 second per phase
+    private static final long SHIFT_DURATION = 500; // 1 second per phase
     private int shiftPhase = 0; // 0 = not shifting, 1 = pre-shift pause, 2 = post-shift pause
 
 
@@ -79,9 +79,16 @@ public class Game extends Canvas {
 
     private ArrayList < Button > buttons = new ArrayList < > ();
 
-    private PointerInfo pointerInfo = MouseInfo.getPointerInfo();
-
-    private Button quitButton;
+    private Button backButton;
+    private Button retryButton;
+    private Button continueButton;
+    
+    private long gameStartTime = 0;
+    private long gameEndTime = 0;
+    private boolean timerRunning = false;
+    
+    private long pauseStartTime = 0;
+    private long totalPausedTime = 0;
 
 
     /*
@@ -133,54 +140,57 @@ public class Game extends Canvas {
         createBufferStrategy(2);
         strategy = getBufferStrategy();
 
-        while (true) {
-            startMenu();
+        Button startButton = new Button("sprites/playButton.png", "sprites/playButtonHover.png", 60, 350);
+	    Button quitButton = new Button("sprites/quitButton.png", "sprites/quitButtonHover.png", 60, 550);
+	    backButton = new Button("sprites/backButton.png", "sprites/backButtonHover.png", GAME_WIDTH / 2 - 50, 550);
+	    retryButton = new Button("sprites/retryButton.png", "sprites/retryButtonHover.png",GAME_WIDTH / 2 - 50, 410);
+	    continueButton = new Button("sprites/continueButton.png", "sprites/continueButtonHover.png", GAME_WIDTH / 2 - 50, 275);
+	    
+	    buttons.add(backButton);	
+	    buttons.add(retryButton);
+	    buttons.add(continueButton);
+	    buttons.add(startButton);
+	    buttons.add(quitButton);
 
-            if (playing) {
-
-                initEntities();
-                initMaps();
-                loadMap(0);
-                lvlTilesWide = getMapWidth(currentMap);
-                maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
-                maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
-
-                // start the game
-                gameLoop();
-            } // if
-        } // while
+		while(true) {
+			startMenu();
+			
+			if(playing) {
+				
+				initMaps();
+	    		loadMap(0);
+	    		lvlTilesWide = getMapWidth(currentMap);
+	    		maxTilesOffset = lvlTilesWide - TILES_IN_WIDTH;
+	        	maxLvlOffsetX = maxTilesOffset * TILES_SIZE;
+	    
+	    		// start the game
+	    		gameLoop();
+			} // if
+		} // while
+			   
 
 
     } // constructor
 
-    // create startMenu
-    private void startMenu() {
-
-        Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
-
-        (SpriteStore.get()).getSprite("sprites/background_menu.png").draw(g, 0, 0);
-
-        Button startButton = new Button("sprites/playButton.png", "sprites/playButtonHover.png", 50, 400);
-        quitButton = new Button("sprites/quitButton.png", "sprites/quitButtonHover.png", 50, 550);
-
-        buttons.add(startButton);
-        buttons.add(quitButton);
-
-        if (pointerInfo != null) {
-            pointerInfo = MouseInfo.getPointerInfo();
-            Point p = pointerInfo.getLocation();
-            for (Button b: buttons) {
-                if (b.isHovered(p.x, p.y)) {
-                    b.drawHovered(g);
-                } else {
-                    b.draw(g);
-                } // else
-            } // for
-        } // if
-
-        strategy.show();
-
-    } // startMenu
+ // create startMenu
+ 		private void startMenu() {
+ 			
+ 			Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+ 		    
+ 			(SpriteStore.get()).getSprite("sprites/bg.png").draw(g, 0, 0);
+ 			(SpriteStore.get()).getSprite("sprites/menu_background.png").draw(g, 5, 250);
+ 		    		   
+ 		 
+ 	       for(Button b : buttons) {
+ 	    	   if(b.getButtonType() == "sprites/continueButton.png" || b.getButtonType() == "sprites/retryButton.png" || b.getButtonType() == "sprites/backButton.png") {
+ 		    	   continue;
+ 	    	   } // if		    	
+ 	    	   b.draw(g);
+ 	       } // for
+ 		                      
+ 		    strategy.show();
+ 			
+ 		} // startMenu
 
     /* initEntities
      * input: none
@@ -311,22 +321,22 @@ public class Game extends Canvas {
 
 
 
-    public ArrayList < Platform > makePlatforms(int[][] map) {
-        ArrayList < Platform > platforms = new ArrayList < > ();
-        for (int row = 0; row < map.length; row++) {
+	public ArrayList<Platform> makePlatforms(int[][] map) {
+    	ArrayList<Platform> platforms = new ArrayList<>();
+    	for (int row = 0; row < map.length; row++) {
             for (int col = 0; col < map[row].length; col++) {
                 if (map[row][col] == 1) {
                     platforms.add(new Platform(
-                        col * TILES_SIZE,
-                        row * TILES_SIZE,
-                        TILES_SIZE,
-                        TILES_SIZE
+                        col * TILES_SIZE, 
+                        row * TILES_SIZE, 
+                        TILES_SIZE, 
+                        TILES_SIZE, map[row][col]
                     ));
                 }
             }
         }
         return platforms;
-    } // makePlatforms
+	} // makePlatforms
     
     public ArrayList < Spike > makeSpikes(int[][] map) {
         ArrayList < Spike > spikes = new ArrayList < > ();
@@ -479,6 +489,21 @@ public class Game extends Canvas {
 
     } // tryToFire
 
+    
+    public void resetGame() {
+    	playing = false;
+		gameRunning = false;
+		entities.clear();
+		removeEntities.clear();
+		leftPressed = false;
+        rightPressed = false;
+        firePressed = false;
+        upPressed = false;
+        shifted = false;
+		paused = false;
+		currentMap = 0; 
+    } // resetGame
+
     /*
      * gameLoop
      * input: none
@@ -508,7 +533,26 @@ public class Game extends Canvas {
             (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
 
             if (!paused) {
-                // move each entity
+            	
+            	if (!timerRunning) {
+        	        timerRunning = true;
+        	        if (pauseStartTime > 0) {
+        	            totalPausedTime += (System.currentTimeMillis() - pauseStartTime);
+        	            pauseStartTime = 0;
+        	        }
+        	    }
+        	 
+            	long currentTimer = System.currentTimeMillis();
+    		 	long elapsedTime = timerRunning ? currentTimer - gameStartTime - totalPausedTime : gameEndTime - gameStartTime;
+
+           	 	long hours = elapsedTime / 3600000;
+           	 	long minutes = (elapsedTime % 3600000) / 60000;
+           	  	long seconds = (elapsedTime % 60000) / 1000;
+           	  	long milliseconds = elapsedTime % 1000;
+           	  
+           	  	message = String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
+           	  	
+           	  	// move each entity
                 if (!waitingForKeyPress) {
                     for (int i = 0; i < entities.size(); i++) {
                         Entity entity = (Entity) entities.get(i);
@@ -630,38 +674,52 @@ public class Game extends Canvas {
                     Thread.sleep(10);
                 } catch (Exception e) {}
             } else {
-                AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
-                g.setComposite(alphaComposite);
-                g.setColor(new Color(0, 0, 0, 255));
-                g.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-                g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-
-                g.setColor(Color.WHITE);
-                g.setFont(new Font("Arial", Font.BOLD, 40));
-                g.drawString("Game Paused", (1000 - g.getFontMetrics().stringWidth("Game Paused")) / 2 + 100, 100);
-
-                for (int i = 0; i < entities.size(); i++) {
-                    Entity entity = (Entity) entities.get(i);
-                    entity.draw(g, xLvlOffset);
-                } // for
-
-                for (Platform platform: platforms) platform.draw(g, xLvlOffset);
-                for (Spike spike: spikes) spike.draw(g, xLvlOffset);
-
-                if (pointerInfo != null) {
-                    pointerInfo = MouseInfo.getPointerInfo();
-                    Point p = pointerInfo.getLocation();
-                    if (quitButton.isHovered(p.x, p.y)) {
-                        quitButton.drawHovered(g);
-                    } else {
-                        quitButton.draw(g);
-                    } // else
-                } // if
-
-                g.dispose();
-                strategy.show();
-
+            	if (timerRunning) {
+                    timerRunning = false;
+                    pauseStartTime = System.currentTimeMillis();
+                }
+            		
+	          	  AlphaComposite alphaComposite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f);
+	          	  g.setComposite(alphaComposite);
+	          	  g.setColor(new Color(0,0,0, 255));
+	          	  g.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+	          	  g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
+	
+	          	
+	          			  
+	          	  for (int i = 0; i < entities.size(); i++) {
+	   	               Entity entity = (Entity) entities.get(i);
+	   	               entity.draw(g, xLvlOffset);
+	   	          } // for
+	   	        
+	   	         for (Platform platform : platforms) platform.draw(g, xLvlOffset);
+	   	         
+	         	  (SpriteStore.get()).getSprite("sprites/pause.png").draw(g, GAME_WIDTH / 2 - 200, 100);
+	         	 (SpriteStore.get()).getSprite("sprites/menu_background.png").draw(g, GAME_WIDTH / 2 - 211, 220);
+	         	  
+	         	 for (Button b : buttons) {
+	         		 if (b.getButtonType() == "sprites/playButton.png" || b.getButtonType() == "sprites/quitButton.png") {
+	         			 continue;
+	         		 } // if
+	         		 b.draw(g);
+	         	 } // for
+	         	   	          
+	          	  g.dispose();
+	          	  strategy.show();
             } // else
+        } // while
+        
+        while (!gameRunning && playing) {
+      	  Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+            (SpriteStore.get()).getSprite("sprites/game_completed.png").draw(g, GAME_WIDTH / 2 - 250, GAME_HEIGHT / 2 - 250);
+          
+            Button exitButton2 = new Button("sprites/backButton.png", "sprites/backButtonHover.png", GAME_WIDTH / 2 + 50, 500);
+            exitButton2.draw(g);
+            
+            
+            
+            g.dispose();
+        	  strategy.show();
         } // while
 
     } // gameLoop
@@ -790,57 +848,64 @@ public class Game extends Canvas {
     } // class KeyInputHandler
 
     private class MouseInputHandler implements MouseListener, MouseMotionListener {
+   	 
+     	public void mouseClicked(MouseEvent e) {
+     		for (Button mb : buttons) {
+					if (isIn(e, mb)) {
+						if(mb.getButtonType().equals("sprites/playButton.png")) {
+							playing = true;
+							gameRunning = true;
+							startGame();
+							break;
+						} else if(mb.getButtonType().equals("sprites/quitButton.png")) {
+							System.exit(0);
+						} else if (mb.getButtonType().equals("sprites/backButton.png")) {
+							resetGame();
+							break;
+						} else if (mb.getButtonType().equals("sprites/continueButton.png")) {
+							paused = false;
+						}  else if (mb.getButtonType().equals("sprites/retryButton.png")) {
+							paused = false;
+						} // else if
+						
+					} // if
+				} // for
+     		
+     	} // mouseClicked
 
-        public void mouseClicked(MouseEvent e) {
-            for (Button mb: buttons) {
-                if (isIn(e, mb)) {
+			@Override
+			public void mouseDragged(MouseEvent e) {} // mouseDragged
 
-                    if (mb.getButtonType().equals("sprites/playButton.png")) {
-                        playing = true;
-                        gameRunning = true;
-                        break;
-                    } else if (mb.getButtonType().equals("sprites/quitButton.png")) {
-                        if (!gameRunning && !playing) {
-                            System.exit(0);
-                            break;
-                        } else if (gameRunning) {
-                            gameRunning = false;
-                            playing = false;
-                            paused = false;
-                            entities.clear();
-                            break;
-                        }
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				for (Button b : buttons) {
+					if (isIn(e, b)) {
+						b.setMouseOver(true);
+					} else {
+						b.setMouseOver(false);
+					} // else
+				} // for
+			} // mouseMoved
 
-                    } // else if  
-                } // if
-            } // for
+			@Override
+			public void mousePressed(MouseEvent e) {} // mousePressed
 
-        } // mouseClicked
+			@Override
+			public void mouseReleased(MouseEvent e) {} // mouseReleased
 
-        @Override
-        public void mouseDragged(MouseEvent e) {} // mouseDragged
+			@Override
+			public void mouseEntered(MouseEvent e) {} // mouseEntered
 
-        @Override
-        public void mouseMoved(MouseEvent e) {} // mouseMoved
+			@Override
+			public void mouseExited(MouseEvent e) {} // mouseExited
+     	 
+     	 
+      } // MouseInputs
+      
+      public boolean isIn(MouseEvent e, Button mb) {
+  		return mb.getBounds().contains(e.getX(), e.getY());
+  	 } // isIn
 
-        @Override
-        public void mousePressed(MouseEvent e) {} // mousePressed
-
-        @Override
-        public void mouseReleased(MouseEvent e) {} // mouseReleased
-
-        @Override
-        public void mouseEntered(MouseEvent e) {} // mouseEntered
-
-        @Override
-        public void mouseExited(MouseEvent e) {} // mouseExited
-
-
-    } // MouseInputs
-
-    public boolean isIn(MouseEvent e, Button mb) {
-        return mb.getBounds().contains(e.getX(), e.getY());
-    } // isIn
 
 
 

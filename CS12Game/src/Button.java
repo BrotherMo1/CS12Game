@@ -11,6 +11,7 @@ public class Button {
 	private Sprite hoveredSprite;
 	private String buttonType;
 	private Rectangle bounds;
+	private boolean mouseOver;
 	
 	
 	// for button with picture
@@ -26,17 +27,6 @@ public class Button {
 		initBounds();
 	} // Main Constructor
 	
-	// for button from rect
-	public Button(String r, int x, int y, int width, int height) {
-		this.buttonType = r;
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
-		
-		bounds = new Rectangle(x, y, width, height);
-		
-	} // Constructor
 	
 	private void initBounds() {
 		bounds = new Rectangle(x, y, normalSprite.getWidth(), normalSprite.getHeight());
@@ -47,16 +37,13 @@ public class Button {
 	}
 	
 	public void draw(Graphics g) {
-		normalSprite.draw(g, x, y);
+		if (mouseOver) {
+			hoveredSprite.draw(g, x, y);
+		} else {
+			normalSprite.draw(g, x, y);
+		} // else
 	} // draw
 	
-	public void drawRect(Graphics gtd) {
-		gtd.drawRect(x, y, width, height);
-	} // draw
-	
-	public void drawHovered(Graphics g) {
-		hoveredSprite.draw(g, x, y);
-	} // drawHovered
 	
 	public int getX() {
 		 return x;
@@ -83,17 +70,15 @@ public class Button {
 		return normalSprite;
 	} // getNormalSprite
 	
-	public boolean isTouching() {
-		return false;
-	} // isTouching
-	
+
 	public String getButtonType() {
 		return buttonType;
 	} // getButtonType
 	
-	public boolean isHovered(int mouseX, int mouseY) {
-	    return bounds.contains(mouseX, mouseY);
-	} // isHovered
+	public void setMouseOver(boolean mouseOver) {
+		this.mouseOver = mouseOver;
+	}
+	
 	
 	
 } // class Button

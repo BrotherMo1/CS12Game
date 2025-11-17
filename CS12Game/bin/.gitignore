@@ -1,4 +1,3 @@
-/sprites/
 /AlienEntity.class
 /AlienShotEntity.class
 /Button.class
@@ -19,10 +18,7 @@
 /Playing.class
 /ShipEntity.class
 /ShotEntity.class
+/Spike.class
 /Sprite.class
 /SpriteStore.class
-<<<<<<< Updated upstream
-=======
-/Spikes.class
-/Spike.class
->>>>>>> Stashed changes
+/sprites/

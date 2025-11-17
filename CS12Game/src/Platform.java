@@ -1,32 +1,51 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 public class Platform {
-	int TILE_SIZE = 50;
-	int x;
-	int y;
-	int width;
-	int height;
+	private final int TILE_SIZE = 32;
+	protected int x;
+	protected int y;
+	protected int width;
+	protected int height;
+    private BufferedImage[] tileSprite;
+    private int spriteIndex;
 	
-	Rectangle hitBox;
 	
-	public Platform(int x, int y, int TILES_DEFAULT_SIZE, int height) {
+	protected Rectangle hitBox;
+	
+	public Platform(int x, int y, int TILES_DEFAULT_SIZE, int height, int spriteIndex) {
 		
 		this.x = x;
 		this.y = y;
 		this.width = TILES_DEFAULT_SIZE;
 		this.height = TILES_DEFAULT_SIZE;
+		this.spriteIndex = spriteIndex;
+		importOutsideSprites();
 		
 		hitBox = new Rectangle(x, y, TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE);
 	} // Platform
 	
 	public void draw(Graphics2D gtd, int xLvlOffset) {
-		 gtd.setColor(Color.GREEN);
-	     gtd.fillRect(x - xLvlOffset, y, width, height);
-	     gtd.setColor(Color.DARK_GRAY);
-	     gtd.drawRect(x - xLvlOffset, y, width, height);
+		gtd.drawImage(tileSprite[spriteIndex], x - xLvlOffset, y, width, height, null);
 	} // draw
+	
+	private void importOutsideSprites() {
+		Sprite sprite = (SpriteStore.get()).getSprite("sprites/outside_sprites.png");
+		BufferedImage img = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		 Graphics2D g = img.createGraphics();
+		    g.drawImage(sprite.getImage(), 0, 0, null);  // <-- this copies the whole sheet ONCE.
+		    g.dispose();
+		
+		tileSprite = new BufferedImage[48];
+		for (int j = 0; j < 4; j++)
+			for (int i = 0; i < 12; i++) {
+				int index = j * 12 + i;
+				tileSprite[index] = img.getSubimage(i * 32, j * 32, 32, 32);
+			}
+	} // importOutsideSprites
 	
 	 public int getX() { return x; }
 	 public int getY() { return y; }
