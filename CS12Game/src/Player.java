@@ -12,8 +12,8 @@ public class Player extends Entity{
 	public Player(Game g, String r, int newX, int newY) {
 		super(r, newX, newY);		
 		game = g;
-		this.maxHealth = 100;
-		this.currentHealth = maxHealth;
+		Player.maxHealth = 100;
+		Player.currentHealth = maxHealth;
 		me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
 		// TODO Auto-generated constructor stub
 	}
@@ -85,6 +85,16 @@ public class Player extends Entity{
 
 	} // jump
 	
+	
+	public void takeDamage(int amount) {
+	    currentHealth -= amount;
+	    if (currentHealth < 0) currentHealth = 0;
+
+	    if (currentHealth == 0) {
+	        game.notifyDeath();
+	    }
+	}
+
 	
 	public void setHorizontalMovement(double dx) {
 	    this.dx = dx;

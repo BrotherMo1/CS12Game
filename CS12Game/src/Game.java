@@ -65,7 +65,7 @@ public class Game extends Canvas {
     private long alienFiringInterval = 500;
     private int alienCount; // # of aliens left on screen
     private long lastShiftTime = 0;
-    private final long SHIFT_DELAY = 1000; // ms
+    private final long SHIFT_DELAY = 250; // ms
     private boolean shifting = false;
     private long shiftStartTime = 0;
     private static final long SHIFT_DURATION = 500; // 1 second per phase
@@ -108,11 +108,14 @@ public class Game extends Canvas {
 	protected int healthBarYStart = (int) (14 * Game.SCALE);
 	protected int healthWidth = healthBarWidth;
 	
-    protected static int maxHealth;
-    protected static int currentHealth;
+    protected static int maxHealth = 100;
+    protected static int currentHealth = maxHealth;
     
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (10 * Game.SCALE);
+	
+	private long lastDamageTimeSpike = 0;
+	private long damageCooldownSpike = 500; // ms
 	
     /*
      * Construct our game and set it running.
@@ -416,6 +419,8 @@ public class Game extends Canvas {
         xLvlOffset = 0;
 
         shifted = false;
+        currentHealth = maxHealth;
+        updateHealthBar();
     }
 
 
@@ -437,8 +442,12 @@ public class Game extends Canvas {
     } // updateLogic
     
     private void updateHealthBar() {
- 		healthWidth = (int) ((player.currentHealth / (float) player.maxHealth) * healthBarWidth);
- 	}
+ 		healthWidth = (int) ((currentHealth / (double) maxHealth) * healthBarWidth);
+ 		System.out.println("healthWidth " + healthWidth);
+ 		System.out.println("currentHealth " + currentHealth);
+ 		System.out.println("maxHealth " + maxHealth);
+ 		System.out.println("healthBarWidth " + healthBarWidth);
+    }
 
     /* Remove an entity from the game.  It will no longer be
      * moved or drawn.
@@ -529,8 +538,30 @@ public class Game extends Canvas {
         shifted = false;
 		paused = false;
 		currentMap = 0; 
+		currentHealth = maxHealth;
+		updateHealthBar();
     } // resetGame
 
+    
+    // helper method to determine if a collision occurs
+    public void collisionChecker() {
+        // brute force collisions, compare every entity
+        // against every other entity.  If any collisions
+        // are detected notify both entities that it has
+        // occurred
+        for (int i = 0; i < entities.size(); i++) {
+            for (int j = i + 1; j < entities.size(); j++) {
+                Entity me = (Entity) entities.get(i);
+                Entity him = (Entity) entities.get(j);
+
+                if (me.collidesWith(him)) {
+                    me.collidedWith(him);
+                    him.collidedWith(me);
+                } // if
+            } // inner for
+        } // outer for
+    } // collisionChecker
+    
     /*
      * gameLoop
      * input: none
@@ -554,6 +585,7 @@ public class Game extends Canvas {
             long delta = System.currentTimeMillis() - lastLoopTime;
             lastLoopTime = System.currentTimeMillis();
             long currentTime = System.currentTimeMillis();
+            lastDamageTimeSpike = System.currentTimeMillis();
 
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
@@ -600,21 +632,7 @@ public class Game extends Canvas {
                 for (Platform platform : platforms) platform.draw(g, xLvlOffset);
                 for (Spike spike : spikes) spike.draw(g, xLvlOffset);
 
-                // brute force collisions, compare every entity
-                // against every other entity.  If any collisions
-                // are detected notify both entities that it has
-                // occurred
-                for (int i = 0; i < entities.size(); i++) {
-                    for (int j = i + 1; j < entities.size(); j++) {
-                        Entity me = (Entity) entities.get(i);
-                        Entity him = (Entity) entities.get(j);
-
-                        if (me.collidesWith(him)) {
-                            me.collidedWith(him);
-                            him.collidedWith(me);
-                        } // if
-                    } // inner for
-                } // outer for
+                collisionChecker();
 
                 // remove dead entities
                 entities.removeAll(removeEntities);
@@ -633,7 +651,7 @@ public class Game extends Canvas {
                 // if waiting for "any key press", draw message
                 if (waitingForKeyPress) {
                     g.setColor(Color.white);
-                    g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message)) / 2, 250);
+                    g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message)) / 2, 285);
                     g.drawString("Press any key", (GAME_HEIGHT - g.getFontMetrics().stringWidth("Press any key")) / 2, 300);
                 } // if
 
@@ -694,10 +712,20 @@ public class Game extends Canvas {
                 } // if
 
                 // check if player falls out of bounds, if true kill them
-                if (player.y > GAME_HEIGHT) {
+                if (player.y > GAME_HEIGHT - 50) {
                    	changeHealth(-100);
                 } // if
-
+                
+             // Spike Collision 
+                for (Spike spike : spikes) {
+                	if (player.getX() < spike.x + spike.width &&
+                		    player.getX() + player.sprite.getWidth() > spike.x &&
+                		    player.getY() < spike.y + spike.height &&
+                		    player.getY() + player.sprite.getHeight() > spike.y) {
+                		    
+                		   	takeSpikeDamage(-1);
+                		} // if spike collide with player
+                } // for
                 
                 // Example: check if player reaches the right edge of the map
                 if (checkLevelEnd()) {
@@ -759,40 +787,26 @@ public class Game extends Canvas {
 
     } // gameLoop
 
-    // change health if player falls out of bounds
+    // change health if player falls out of bounds or gets hit
     private void changeHealth(int value) {
 
 		if (value < 0) {
-			if (player.y > GAME_HEIGHT - 50) {
-				currentHealth = 0;
-				updateHealthBar();
-			} // if
-
-		currentHealth += value;
-		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
-		if (currentHealth <= 0) notifyDeath();
+			currentHealth += value;
+			currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
+			updateHealthBar();
+			if (currentHealth <= 0) notifyDeath();
 		} // if
 	} // changeHealth
 
-    // change health of player based on different events
-    private void changeHealth(int value, Entity other) {
-		// TODO Auto-generated method stub
-		if (value < 0) {
-			if (player.y > GAME_HEIGHT - 50) {
-				currentHealth = 0;
-				updateHealthBar();
-			} // if
-//			if (spikes == collidedWith(other))
-//				return;
-//			else
-//				newState(collidedWith(other));
-		} // if value
-		currentHealth += value;
-		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
-		if (currentHealth < 0) {
-			notifyDeath();
-		} // if
-	} // changeHealth
+    // add delay in taking spike damage
+    public void takeSpikeDamage(int value) {
+        long now = System.currentTimeMillis();
+        if (now - lastDamageTimeSpike < damageCooldownSpike) return;
+        lastDamageTimeSpike = now;
+
+        changeHealth(value);
+    } // takeSpikeDamage
+    
 
 	/* startGame
      * input: none
@@ -804,14 +818,16 @@ public class Game extends Canvas {
         entities.clear();
 
         initEntities();
-
+        
         // blank out any keyboard settings that might exist
         leftPressed = false;
         rightPressed = false;
         firePressed = false;
         upPressed = false;
         paused = false;
-
+        currentHealth = maxHealth;
+        updateHealthBar();
+        
     } // startGame
 
 
