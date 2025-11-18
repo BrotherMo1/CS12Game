@@ -7,6 +7,7 @@ public class Player extends Entity{
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
     
+    
 
 
 	public Player(Game g, String r, int newX, int newY) {
@@ -32,11 +33,6 @@ public class Player extends Entity{
 	    x += (dx * delta) / 1000;
 	    me.setLocation((int)x, (int)y);
 	    
-	    for (Spike spike : game.getSpikes()) {
-	    	if (me.intersects(spike.hitBox)) {
-	    		takeSpikeDamage(-1);
-	    	}
-	    }
 	    
 		// horizontal collisions 
 	    for (Platform platform : game.getPlatforms()) {

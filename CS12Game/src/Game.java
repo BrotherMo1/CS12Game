@@ -847,6 +847,7 @@ public class Game extends Canvas {
         
         // blank out any keyboard settings that might exist
         currentMap = 0;
+        loadMap(currentMap);
         leftPressed = false;
         rightPressed = false;
         firePressed = false;
