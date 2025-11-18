@@ -1,8 +1,8 @@
 public class Player extends Entity{
 	
 	private Game game;
-    private double dx = 0;        // Horizontal speed
-    private double dy = 0;        // Vertical speed (gravity)
+    protected static double dx = 0;        // Horizontal speed
+    protected static double dy = 0;        // Vertical speed (gravity)
     private boolean onGround = true;    // Is the player on the ground or a platform?
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump

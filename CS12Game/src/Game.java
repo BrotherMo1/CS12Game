@@ -117,6 +117,10 @@ public class Game extends Canvas {
 	private long lastDamageTimeSpike = 0;
 	private long damageCooldownSpike = 500; // ms
 	
+	// fall dmg
+	private boolean prevOnGround = true;
+	private final double FALL_DAMAGE_THRESHOLD = 3;
+	
     /*
      * Construct our game and set it running.
      */
@@ -443,10 +447,7 @@ public class Game extends Canvas {
     
     private void updateHealthBar() {
  		healthWidth = (int) ((currentHealth / (double) maxHealth) * healthBarWidth);
- 		System.out.println("healthWidth " + healthWidth);
- 		System.out.println("currentHealth " + currentHealth);
- 		System.out.println("maxHealth " + maxHealth);
- 		System.out.println("healthBarWidth " + healthBarWidth);
+ 		System.out.println("currentHealh" + currentHealth);
     }
 
     /* Remove an entity from the game.  It will no longer be
@@ -710,6 +711,26 @@ public class Game extends Canvas {
                 if (firePressed && player.isOnGround()) {
                     tryToFire();
                 } // if
+                
+             // FALL DAMAGE CHECK
+                if (prevOnGround && !player.isOnGround()) {
+                	
+                    // Player has JUST landed this frame
+                    double impactSpeed = Math.abs(player.dy);
+                    System.out.println("Impact Speed " + impactSpeed);
+                    if (impactSpeed > FALL_DAMAGE_THRESHOLD) {
+                        int damage = (int)((impactSpeed - FALL_DAMAGE_THRESHOLD) * 2);
+                        changeHealth(damage);
+                        System.out.println("dmg " + damage);
+                        System.out.println("current health " + currentHealth);
+                    } // if 
+
+                    // Reset vertical velocity on landing
+                    player.dy = 0;
+                } // if
+
+                // Update previous ground state
+                prevOnGround = player.isOnGround();
 
                 // check if player falls out of bounds, if true kill them
                 if (player.y > GAME_HEIGHT - 50) {
