@@ -7,6 +7,7 @@ import java.awt.AlphaComposite;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -65,7 +66,7 @@ public class Game extends Canvas {
     private long alienFiringInterval = 500;
     private int alienCount; // # of aliens left on screen
     private long lastShiftTime = 0;
-    private final long SHIFT_DELAY = 250; // ms
+    private final long SHIFT_DELAY = 1000; // ms
     private boolean shifting = false;
     private long shiftStartTime = 0;
     private static final long SHIFT_DURATION = 500; // 1 second per phase
@@ -655,6 +656,10 @@ public class Game extends Canvas {
                     g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message)) / 2, 285);
                     g.drawString("Press any key", (GAME_HEIGHT - g.getFontMetrics().stringWidth("Press any key")) / 2, 300);
                 } // if
+                
+                g.setColor(Color.WHITE);
+                g.setFont(new Font("Arial", Font.BOLD, 30));
+                g.drawString("Time: " + message, GAME_WIDTH / 2 - 150, 30);
 
                 // clear graphics and flip buffer
                 g.dispose();
@@ -737,16 +742,16 @@ public class Game extends Canvas {
                    	changeHealth(-100);
                 } // if
                 
-             // Spike Collision 
-                for (Spike spike : spikes) {
-                	if (player.getX() < spike.x + spike.width &&
-                		    player.getX() + player.sprite.getWidth() > spike.x &&
-                		    player.getY() < spike.y + spike.height &&
-                		    player.getY() + player.sprite.getHeight() > spike.y) {
-                		    
-                		   	takeSpikeDamage(-1);
-                		} // if spike collide with player
-                } // for
+//             // Spike Collision 
+//                for (Spike spike : spikes) {
+//                	if (player.getX() < spike.x + spike.width &&
+//                		    player.getX() + player.sprite.getWidth() > spike.x &&
+//                		    player.getY() < spike.y + spike.height &&
+//                		    player.getY() + player.sprite.getHeight() > spike.y) {
+//                		    
+//                		   	
+//                		} // if spike collide with player
+//                } // for
                 
                 // Example: check if player reaches the right edge of the map
                 if (checkLevelEnd()) {
@@ -841,6 +846,7 @@ public class Game extends Canvas {
         initEntities();
         
         // blank out any keyboard settings that might exist
+        currentMap = 0;
         leftPressed = false;
         rightPressed = false;
         firePressed = false;
@@ -848,6 +854,9 @@ public class Game extends Canvas {
         paused = false;
         currentHealth = maxHealth;
         updateHealthBar();
+        
+        gameStartTime = System.currentTimeMillis();
+        timerRunning = true;
         
     } // startGame
 
@@ -873,7 +882,9 @@ public class Game extends Canvas {
             } // if
 
             if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
-                shifted = !shifted;
+            	if(!shifting) {
+            		shifted = !shifted;
+            	}
             }
 
             if (shifted == false) {

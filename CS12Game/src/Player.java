@@ -34,7 +34,7 @@ public class Player extends Entity{
 	    
 	    for (Spike spike : game.getSpikes()) {
 	    	if (me.intersects(spike.hitBox)) {
-	    		game.notifyDeath();
+//	    		takeSpikeDamage(-1);
 	    	}
 	    }
 	    
