@@ -742,16 +742,16 @@ public class Game extends Canvas {
                    	changeHealth(-100);
                 } // if
                 
-//             // Spike Collision 
-//                for (Spike spike : spikes) {
-//                	if (player.getX() < spike.x + spike.width &&
-//                		    player.getX() + player.sprite.getWidth() > spike.x &&
-//                		    player.getY() < spike.y + spike.height &&
-//                		    player.getY() + player.sprite.getHeight() > spike.y) {
-//                		    
-//                		   	
-//                		} // if spike collide with player
-//                } // for
+             // Spike Collision 
+                for (Spike spike : spikes) {
+                	if (player.getX() < spike.x + spike.width &&
+                		    player.getX() + player.sprite.getWidth() > spike.x &&
+                		    player.getY() < spike.y + spike.height &&
+                		    player.getY() + player.sprite.getHeight() > spike.y) {
+                		    
+                		   	
+                		} // if spike collide with player
+                } // for
                 
                 // Example: check if player reaches the right edge of the map
                 if (checkLevelEnd()) {
@@ -883,7 +883,7 @@ public class Game extends Canvas {
 
             if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
             	if(!shifting) {
-            		shifted = !shifted;
+                shifted = !shifted;
             	}
             }
 
