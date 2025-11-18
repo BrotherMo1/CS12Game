@@ -23,6 +23,7 @@
     protected Rectangle me = new Rectangle(); // bounding rectangle of
                                             // this entity
     protected Rectangle him = new Rectangle(); // bounding rect. of other
+	public int healthWidth;
 	public static int currentHealth;
 	public static int maxHealth;
     
@@ -122,5 +123,17 @@
       *       that extends this class
       */
       public abstract void collidedWith(Entity other);
+
+
+	public void dmgChecker() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void updateHealthBar() {
+		// TODO Auto-generated method stub
+		
+	}
 
  } // Entity class

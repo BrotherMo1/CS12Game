@@ -102,25 +102,15 @@ public class Game extends Canvas {
     
     private long pauseStartTime = 0;
     private long totalPausedTime = 0;
-
-	protected int healthBarWidth = (int) (150 * Game.SCALE);
+    
+	public int healthBarWidth = (int) (150 * Game.SCALE);
 	protected int healthBarHeight = (int) (4 * Game.SCALE);
 	protected int healthBarXStart = (int) (34 * Game.SCALE);
 	protected int healthBarYStart = (int) (14 * Game.SCALE);
-	protected int healthWidth = healthBarWidth;
 	
-    protected static int maxHealth = 100;
-    protected static int currentHealth = maxHealth;
-    
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (10 * Game.SCALE);
-	
-	private long lastDamageTimeSpike = 0;
-	private long damageCooldownSpike = 500; // ms
-	
-	// fall dmg
-	private boolean prevOnGround = true;
-	private final double FALL_DAMAGE_THRESHOLD = 3;
+
 	
     /*
      * Construct our game and set it running.
@@ -424,8 +414,6 @@ public class Game extends Canvas {
         xLvlOffset = 0;
 
         shifted = false;
-        currentHealth = maxHealth;
-        updateHealthBar();
     }
 
 
@@ -445,11 +433,7 @@ public class Game extends Canvas {
     public void updateLogic() {
         logicRequiredThisLoop = true;
     } // updateLogic
-    
-    private void updateHealthBar() {
- 		healthWidth = (int) ((currentHealth / (double) maxHealth) * healthBarWidth);
- 		System.out.println("currentHealh" + currentHealth);
-    }
+   
 
     /* Remove an entity from the game.  It will no longer be
      * moved or drawn.
@@ -540,8 +524,6 @@ public class Game extends Canvas {
         shifted = false;
 		paused = false;
 		currentMap = 0; 
-		currentHealth = maxHealth;
-		updateHealthBar();
     } // resetGame
 
     
@@ -587,13 +569,12 @@ public class Game extends Canvas {
             long delta = System.currentTimeMillis() - lastLoopTime;
             lastLoopTime = System.currentTimeMillis();
             long currentTime = System.currentTimeMillis();
-            lastDamageTimeSpike = System.currentTimeMillis();
 
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
             g.setColor(Color.red);
-           	g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
+           	g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, player.healthWidth, healthBarHeight);
            	
             if (!paused) {
             	
@@ -671,13 +652,10 @@ public class Game extends Canvas {
                 
                 if (shifted && !shifting) {
 
-
                     // only allow shift if enough time passed since last one
                     if (currentTime - lastShiftTime >= SHIFT_DELAY) {
                         shiftStartTime = currentTime;
                         shifting = true;
-
-
                     }
                 }
 
@@ -717,41 +695,9 @@ public class Game extends Canvas {
                     tryToFire();
                 } // if
                 
-             // FALL DAMAGE CHECK
-                if (prevOnGround && !player.isOnGround()) {
-                	
-                    // Player has JUST landed this frame
-                    double impactSpeed = Math.abs(player.dy);
-                    System.out.println("Impact Speed " + impactSpeed);
-                    if (impactSpeed > FALL_DAMAGE_THRESHOLD) {
-                        int damage = (int)((impactSpeed - FALL_DAMAGE_THRESHOLD) * 2);
-                        changeHealth(damage);
-                        System.out.println("dmg " + damage);
-                        System.out.println("current health " + currentHealth);
-                    } // if 
-
-                    // Reset vertical velocity on landing
-                    player.dy = 0;
-                } // if
-
-                // Update previous ground state
-                prevOnGround = player.isOnGround();
-
-                // check if player falls out of bounds, if true kill them
-                if (player.y > GAME_HEIGHT - 50) {
-                   	changeHealth(-100);
-                } // if
-                
-             // Spike Collision 
-                for (Spike spike : spikes) {
-                	if (player.getX() < spike.x + spike.width &&
-                		    player.getX() + player.sprite.getWidth() > spike.x &&
-                		    player.getY() < spike.y + spike.height &&
-                		    player.getY() + player.sprite.getHeight() > spike.y) {
-                		    
-                		   	
-                		} // if spike collide with player
-                } // for
+                // check for dmg and update health
+                player.dmgChecker();
+                player.updateHealthBar(); 
                 
                 // Example: check if player reaches the right edge of the map
                 if (checkLevelEnd()) {
@@ -812,26 +758,6 @@ public class Game extends Canvas {
         } // while
 
     } // gameLoop
-
-    // change health if player falls out of bounds or gets hit
-    private void changeHealth(int value) {
-
-		if (value < 0) {
-			currentHealth += value;
-			currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
-			updateHealthBar();
-			if (currentHealth <= 0) notifyDeath();
-		} // if
-	} // changeHealth
-
-    // add delay in taking spike damage
-    public void takeSpikeDamage(int value) {
-        long now = System.currentTimeMillis();
-        if (now - lastDamageTimeSpike < damageCooldownSpike) return;
-        lastDamageTimeSpike = now;
-
-        changeHealth(value);
-    } // takeSpikeDamage
     
 
 	/* startGame
@@ -853,8 +779,6 @@ public class Game extends Canvas {
         firePressed = false;
         upPressed = false;
         paused = false;
-        currentHealth = maxHealth;
-        updateHealthBar();
         
         gameStartTime = System.currentTimeMillis();
         timerRunning = true;
