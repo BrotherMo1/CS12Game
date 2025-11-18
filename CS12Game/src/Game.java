@@ -693,9 +693,10 @@ public class Game extends Canvas {
                     tryToFire();
                 } // if
 
+                // check if player falls out of bounds, if true kill them
                 if (player.y > GAME_HEIGHT) {
                    	changeHealth(-100);
-                   }
+                } // if
 
                 
                 // Example: check if player reaches the right edge of the map
@@ -760,7 +761,7 @@ public class Game extends Canvas {
 
     // change health if player falls out of bounds
     private void changeHealth(int value) {
-		// TODO Auto-generated method stub
+
 		if (value < 0) {
 			if (player.y > GAME_HEIGHT - 50) {
 				currentHealth = 0;
@@ -769,8 +770,7 @@ public class Game extends Canvas {
 
 		currentHealth += value;
 		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
-		if (currentHealth < 0) notifyDeath();
-
+		if (currentHealth <= 0) notifyDeath();
 		} // if
 	} // changeHealth
 
