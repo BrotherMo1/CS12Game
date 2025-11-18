@@ -18,12 +18,13 @@
     protected Sprite sprite; // this entity's sprite
     protected double dx; // horizontal speed (px/s)  + -> right
     protected double dy; // vertical speed (px/s) + -> down
-    protected int maxHealth;
-    protected int currentHealth;
+
     
     protected Rectangle me = new Rectangle(); // bounding rectangle of
                                             // this entity
     protected Rectangle him = new Rectangle(); // bounding rect. of other
+	public static int currentHealth;
+	public static int maxHealth;
     
     
                                              // entities

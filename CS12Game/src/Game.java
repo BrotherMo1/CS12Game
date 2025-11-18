@@ -3,11 +3,23 @@
  *
  */
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
+import java.awt.AlphaComposite;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class Game extends Canvas {
 
@@ -90,7 +102,18 @@ public class Game extends Canvas {
     private long pauseStartTime = 0;
     private long totalPausedTime = 0;
 
-
+	protected int healthBarWidth = (int) (150 * Game.SCALE);
+	protected int healthBarHeight = (int) (4 * Game.SCALE);
+	protected int healthBarXStart = (int) (34 * Game.SCALE);
+	protected int healthBarYStart = (int) (14 * Game.SCALE);
+	protected int healthWidth = healthBarWidth;
+	
+    protected static int maxHealth;
+    protected static int currentHealth;
+    
+	private int statusBarX = (int) (10 * Game.SCALE);
+	private int statusBarY = (int) (10 * Game.SCALE);
+	
     /*
      * Construct our game and set it running.
      */
@@ -264,7 +287,7 @@ public class Game extends Canvas {
     		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
     		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
     		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
-    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    		{1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 		
 		//java 1D version
@@ -412,6 +435,10 @@ public class Game extends Canvas {
     public void updateLogic() {
         logicRequiredThisLoop = true;
     } // updateLogic
+    
+    private void updateHealthBar() {
+ 		healthWidth = (int) ((player.currentHealth / (float) player.maxHealth) * healthBarWidth);
+ 	}
 
     /* Remove an entity from the game.  It will no longer be
      * moved or drawn.
@@ -531,7 +558,9 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
-
+            g.setColor(Color.red);
+           	g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, healthWidth, healthBarHeight);
+           	
             if (!paused) {
             	
             	if (!timerRunning) {
@@ -664,6 +693,11 @@ public class Game extends Canvas {
                     tryToFire();
                 } // if
 
+                if (player.y > GAME_HEIGHT) {
+                   	changeHealth(-100);
+                   }
+
+                
                 // Example: check if player reaches the right edge of the map
                 if (checkLevelEnd()) {
                     goToNextLevel();
@@ -724,8 +758,43 @@ public class Game extends Canvas {
 
     } // gameLoop
 
+    // change health if player falls out of bounds
+    private void changeHealth(int value) {
+		// TODO Auto-generated method stub
+		if (value < 0) {
+			if (player.y > GAME_HEIGHT - 50) {
+				currentHealth = 0;
+				updateHealthBar();
+			} // if
 
-    /* startGame
+		currentHealth += value;
+		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
+		if (currentHealth < 0) notifyDeath();
+
+		} // if
+	} // changeHealth
+
+    // change health of player based on different events
+    private void changeHealth(int value, Entity other) {
+		// TODO Auto-generated method stub
+		if (value < 0) {
+			if (player.y > GAME_HEIGHT - 50) {
+				currentHealth = 0;
+				updateHealthBar();
+			} // if
+//			if (spikes == collidedWith(other))
+//				return;
+//			else
+//				newState(collidedWith(other));
+		} // if value
+		currentHealth += value;
+		currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
+		if (currentHealth < 0) {
+			notifyDeath();
+		} // if
+	} // changeHealth
+
+	/* startGame
      * input: none
      * output: none
      * purpose: start a fresh game, clear old data

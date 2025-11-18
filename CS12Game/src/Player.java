@@ -7,11 +7,7 @@ public class Player extends Entity{
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
     
-	private int healthBarWidth = (int) (150 * Game.SCALE);
-	private int healthBarHeight = (int) (4 * Game.SCALE);
-	private int healthBarXStart = (int) (34 * Game.SCALE);
-	private int healthBarYStart = (int) (14 * Game.SCALE);
-	private int healthWidth = healthBarWidth;
+
 
 	public Player(Game g, String r, int newX, int newY) {
 		super(r, newX, newY);		
@@ -36,8 +32,6 @@ public class Player extends Entity{
 	    x += (dx * delta) / 1000;
 	    me.setLocation((int)x, (int)y);
 	    
-//		if (game.isShifting()) return;
-		
 	    for (Spike spike : game.getSpikes()) {
 	    	if (me.intersects(spike.hitBox)) {
 	    		game.notifyDeath();
