@@ -50,7 +50,7 @@ public class Player extends Entity{
 		
 		for (Spike spike : game.getSpikes()) {
 			if (me.intersects(spike.hitBox)) {
-				takeSpikeDamage(10);
+				takeSpikeDamage(-10);
 			}
 		}
 	} // dmgChecker
