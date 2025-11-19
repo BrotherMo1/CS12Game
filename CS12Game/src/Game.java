@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 public class Game extends Canvas {
 
     private BufferStrategy strategy; // take advantage of accelerated graphics
-    private boolean waitingForKeyPress = true; // true if game held up until
+    private boolean waitingForKeyPress = false; // true if game held up until
     // a key is pressed
     private boolean leftPressed = false; // true if left arrow key currently pressed
     private boolean rightPressed = false; // true if right arrow key currently pressed
@@ -217,21 +217,10 @@ public class Game extends Canvas {
      *          Each entity will be added to the array of entities in the game.
      */
     private void initEntities() {
+    	
         // create the ship and put in center of screen
         player = new Player(this, "sprites/ship1.png", 70, 650);
         entities.add(player);
-
-        // create a block of aliens (5x12)
-        alienCount = 0;
-        for (int row = 0; row < 7; row++) {
-            for (int col = 0; col < 12; col++) {
-                Entity alien = new AlienEntity(this, "sprites/alien.gif",
-                    100 + (col * 40),
-                    50 + (row * 30));
-                entities.add(alien);
-                alienCount++;
-            } // for
-        } // outer for
     } // initEntities
     
     public boolean isShifting() {
@@ -529,28 +518,31 @@ public class Game extends Canvas {
         return false;
     }
 
-    private void goToNextLevel() {
-        currentMap++; // move to next map
-        if (currentMap >= maps.size()) {
-            currentMap = 0; // or end the game
-            notifyWin();
-            return;
-        }
+	private void goToNextLevel() {
+		if (currentMap % 2 == 1)
+			currentMap++;
+		else if (currentMap % 2 == 0)
+			currentMap += 2;
+		if (currentMap >= maps.size()) {
+			notifyWin();
+			return;
+		}
 
-        // Load the next map's platforms
-        loadMap(currentMap);
+		// Load the next map's platforms
+		loadMap(currentMap);
 
-        // Reset player position at the start of the new map
-        player.x = 70; // starting X position
-        player.y = 650; // starting Y, adjust if needed
-        player.setHorizontalMovement(0);
-        player.setVerticalMovement(0);
+		// Reset player position at the start of the new map
+		player.x = 80; // starting X position
+		player.y = 300; // starting Y, adjust if needed
+		player.setHorizontalMovement(0);
+		player.setVerticalMovement(0);
 
-        // Reset level scrolling
-        xLvlOffset = 0;
+		// Reset level scrolling
+		xLvlOffset = 0;
 
-        shifted = false;
-    }
+		if (shifted)
+			shifted = !shifted;
+	} // goToNextLevel
 
 
 

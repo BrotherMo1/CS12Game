@@ -7,6 +7,7 @@ public class Player extends Entity{
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
     private boolean takenFallDamage = false;
+    private double impactSpeed = 0;
     
 	private long lastDamageTimeSpike = 0;
 	private long damageCooldownSpike = 500; // ms
@@ -31,13 +32,7 @@ public class Player extends Entity{
 	    // FALL DAMAGE CHECK
 	    	
 		// Player has JUST landed this frame
-		double impactSpeed = dy;
-		if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
-//	    	        int damage = (int)(impactSpeed - FALL_DAMAGE_THRESHOLD) * 2;
-			int damage = -10;
-			changeHealth(damage);
-			takenFallDamage = true;
-		} // if 
+		
 		
 		// Reset vertical velocity on landing
 		if (onGround) {
@@ -115,6 +110,16 @@ public class Player extends Entity{
 	    for (Platform platform : game.getPlatforms()) {
 	    	if (me.intersects(platform.hitBox)) {
 	    		if (dy > 0) { 
+	    			
+	    			impactSpeed = dy;
+	    			if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
+//	    		    	        int damage = (int)(impactSpeed - FALL_DAMAGE_THRESHOLD) * 2;
+	    				int damage = -10;
+	    				changeHealth(damage);
+	    				takenFallDamage = true;
+	    			} // if 
+	    			
+	    			
 	    			y = platform.y - me.height;
 	    			dy = 0;
 	    			onGround = true;
