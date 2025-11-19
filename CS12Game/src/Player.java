@@ -1,32 +1,25 @@
 public class Player extends Entity{
 	
 	private Game game;
-    protected static double dx = 0;        // Horizontal speed
-    protected static double dy = 0;        // Vertical speed (gravity)
+    protected double dx = 0;        // Horizontal speed
+    protected double dy = 0;        // Vertical speed (gravity)
     private boolean onGround = true;    // Is the player on the ground or a platform?
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
     private boolean takenFallDamage = false;
-    
-    protected int maxHealth = 100;
-    protected int currentHealth = maxHealth;
     
 	private long lastDamageTimeSpike = 0;
 	private long damageCooldownSpike = 500; // ms
 	
 	// fall dmg
 	private final double FALL_DAMAGE_THRESHOLD = 500;
-    
-
-
-	public int healthWidth;
 
 	public Player(Game g, String r, int newX, int newY) {
 	    super(r, newX, newY);		
 	    game = g;
 
 	    this.maxHealth = 100;
-	    this.currentHealth = maxHealth;
+	    this.currentHealth = this.maxHealth;
 	    this.healthWidth = game.healthBarWidth;
 
 	    me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
@@ -39,13 +32,10 @@ public class Player extends Entity{
 	    	
 	        // Player has JUST landed this frame
 	        double impactSpeed = dy;
-	        System.out.println("Impact Speed " + impactSpeed);
 	        if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
 //	            int damage = (int)(impactSpeed - FALL_DAMAGE_THRESHOLD) * 2;
 	            int damage = -10;
 	            changeHealth(damage);
-	            System.out.println("dmg " + damage);
-	            System.out.println("current health " + currentHealth);
 	            takenFallDamage = true;
 	        } // if 
 
@@ -55,14 +45,13 @@ public class Player extends Entity{
 	        }
 	    // check if player falls out of bounds, if true kill them
 	    if (y > game.GAME_HEIGHT - 50) {
-	       	changeHealth(-100);
+	       	changeHealth(-this.maxHealth);
 	    } // if
-	}
+	} // dmgChecker
 
     
     public void updateHealthBar() {
- 		healthWidth = (int) ((currentHealth / (double) maxHealth) * game.healthBarWidth);
- 		System.out.println("currentHealh" + currentHealth);
+ 		this.healthWidth = (int) ((this.currentHealth / (double) this.maxHealth) * game.healthBarWidth);
     }
     
     // change health if player falls out of bounds or gets hit
@@ -70,10 +59,11 @@ public class Player extends Entity{
 
 		if (value < 0) {
 			this.currentHealth += value;
-			this.currentHealth = Math.max(Math.min(currentHealth, maxHealth), 0);
-			updateHealthBar();
+			this.currentHealth = Math.max(Math.min(this.currentHealth, this.maxHealth), 0);
+
 			if (this.currentHealth <= 0) game.notifyDeath();
 		} // if
+		updateHealthBar();
 	} // changeHealth
 
     // add delay in taking spike damage

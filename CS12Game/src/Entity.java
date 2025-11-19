@@ -23,13 +23,11 @@
     protected Rectangle me = new Rectangle(); // bounding rectangle of
                                             // this entity
     protected Rectangle him = new Rectangle(); // bounding rect. of other
-	public int healthWidth;
-	public static int currentHealth;
-	public static int maxHealth;
     
-    
-                                             // entities
-                                             
+    protected int healthWidth;
+	protected int currentHealth;
+	protected int maxHealth;
+
     /* Constructor
      * input: reference to the image for this entity,
      *        initial x and y location to be drawn at
@@ -132,6 +130,12 @@
 
 
 	public void updateHealthBar() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void takeSpikeDamage(int i) {
 		// TODO Auto-generated method stub
 		
 	}

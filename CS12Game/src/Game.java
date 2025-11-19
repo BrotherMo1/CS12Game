@@ -103,10 +103,10 @@ public class Game extends Canvas {
     private long pauseStartTime = 0;
     private long totalPausedTime = 0;
     
-	public int healthBarWidth = (int) (150 * Game.SCALE);
-	protected int healthBarHeight = (int) (4 * Game.SCALE);
-	protected int healthBarXStart = (int) (34 * Game.SCALE);
-	protected int healthBarYStart = (int) (14 * Game.SCALE);
+    protected int healthBarWidth = (int) (150 * Game.SCALE);
+    private int healthBarHeight = (int) (4 * Game.SCALE);
+    private int healthBarXStart = (int) (34 * Game.SCALE);
+	private int healthBarYStart = (int) (14 * Game.SCALE);
 	
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (10 * Game.SCALE);
@@ -524,6 +524,9 @@ public class Game extends Canvas {
         shifted = false;
 		paused = false;
 		currentMap = 0; 
+	    player.healthWidth = healthBarWidth;
+		player.updateHealthBar();
+		
     } // resetGame
 
     
@@ -573,6 +576,12 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
+            
+            // check for dmg and update health
+            player.dmgChecker();
+            player.updateHealthBar(); 
+            
+            // draw health bar
             g.setColor(Color.red);
            	g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, player.healthWidth, healthBarHeight);
            	
@@ -583,8 +592,8 @@ public class Game extends Canvas {
         	        if (pauseStartTime > 0) {
         	            totalPausedTime += (System.currentTimeMillis() - pauseStartTime);
         	            pauseStartTime = 0;
-        	        }
-        	    }
+        	        } // if
+        	    } // if
         	 
             	long currentTimer = System.currentTimeMillis();
     		 	long elapsedTime = timerRunning ? currentTimer - gameStartTime - totalPausedTime : gameEndTime - gameStartTime;
@@ -693,11 +702,7 @@ public class Game extends Canvas {
                 // if spacebar pressed, try to fire
                 if (firePressed && player.isOnGround()) {
                     tryToFire();
-                } // if
-                
-                // check for dmg and update health
-                player.dmgChecker();
-                player.updateHealthBar(); 
+                } // if            
                 
                 // Example: check if player reaches the right edge of the map
                 if (checkLevelEnd()) {
@@ -782,6 +787,8 @@ public class Game extends Canvas {
         
         gameStartTime = System.currentTimeMillis();
         timerRunning = true;
+	    player.healthWidth = healthBarWidth;
+        player.updateHealthBar();
         
     } // startGame
 
