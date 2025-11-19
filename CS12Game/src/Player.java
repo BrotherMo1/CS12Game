@@ -30,23 +30,29 @@ public class Player extends Entity{
 		
 	    // FALL DAMAGE CHECK
 	    	
-	        // Player has JUST landed this frame
-	        double impactSpeed = dy;
-	        if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
-//	            int damage = (int)(impactSpeed - FALL_DAMAGE_THRESHOLD) * 2;
-	            int damage = -10;
-	            changeHealth(damage);
-	            takenFallDamage = true;
-	        } // if 
-
-	        // Reset vertical velocity on landing
-	        if (onGround) {
-	        	takenFallDamage = false;
-	        }
-	    // check if player falls out of bounds, if true kill them
-	    if (y > game.GAME_HEIGHT - 50) {
-	       	changeHealth(-this.maxHealth);
+		// Player has JUST landed this frame
+		double impactSpeed = dy;
+		if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
+//	    	        int damage = (int)(impactSpeed - FALL_DAMAGE_THRESHOLD) * 2;
+			int damage = -10;
+			changeHealth(damage);
+			takenFallDamage = true;
+		} // if 
+		
+		// Reset vertical velocity on landing
+		if (onGround) {
+			takenFallDamage = false;
+		}
+		// check if player falls out of bounds, if true kill them
+		if (y > game.GAME_HEIGHT - 50) {
+			changeHealth(-this.maxHealth);
 	    } // if
+		
+		for (Spike spike : game.getSpikes()) {
+			if (me.intersects(spike.hitBox)) {
+				takeSpikeDamage(10);
+			}
+		}
 	} // dmgChecker
 
     

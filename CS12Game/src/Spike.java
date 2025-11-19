@@ -14,11 +14,11 @@ public class Spike{
 	public Spike(int x, int y, int TILES_DEFAULT_SIZE, int height) {
 		
 		this.x = x;
-		this.y = y;
+		this.y = y + (TILES_DEFAULT_SIZE / 2);
 		this.width = TILES_DEFAULT_SIZE;
 		this.height = TILES_DEFAULT_SIZE / 2;
 		
-		hitBox = new Rectangle(x, y, TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE / 2);
+		hitBox = new Rectangle(x, y + (TILES_DEFAULT_SIZE / 2), TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE / 2);
 	} // Platform
 	
 	public void draw(Graphics2D gtd, int xLvlOffset) {

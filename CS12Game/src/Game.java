@@ -284,8 +284,8 @@ public class Game extends Canvas {
     		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1},
     		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
     		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
-    		{1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
-    		{1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+    		{1,0,0,2,2,2,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,2,1},
+    		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 		
 		//java 1D version
@@ -297,7 +297,7 @@ public class Game extends Canvas {
 		    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 		    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
 		    {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
-		   	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
+		   	{1,0,0,0,2,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1},
 		   	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 		   	{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}};
 		
@@ -380,16 +380,16 @@ public class Game extends Canvas {
 
 
     private boolean checkLevelEnd() {
-        int tileX = (int)((player.x + player.sprite.getWidth() / 2) / TILES_SIZE);
-        int tileY = (int)((player.y + player.sprite.getHeight()) / TILES_SIZE); // bottom of player
+    	// Define how close to the right edge triggers level end
+        int endZoneWidth = 50; // pixels
+        int mapRightEdge = lvlTilesWide * TILES_SIZE;
+        int playerRightEdge = player.getX() + player.sprite.getWidth();
 
-        int[][] map = maps.get(currentMap);
-
-        if (tileY < map.length && tileX < map[0].length) {
-            if (map[tileY][tileX] == 2) {
-                return true; // player reached the end tile
-            }
+        // Check if player is in the end zone at the right edge
+        if (playerRightEdge >= mapRightEdge - endZoneWidth) {
+            return true;
         }
+
         return false;
     }
 
@@ -734,7 +734,7 @@ public class Game extends Canvas {
 	   	        
 	   	         for (Platform platform : platforms) platform.draw(g, xLvlOffset);
 	   	         
-	         	  (SpriteStore.get()).getSprite("sprites/pause.png").draw(g, GAME_WIDTH / 2 - 200, 100);
+	         	 (SpriteStore.get()).getSprite("sprites/pause.png").draw(g, GAME_WIDTH / 2 - 200, 100);
 	         	 (SpriteStore.get()).getSprite("sprites/menu_background.png").draw(g, GAME_WIDTH / 2 - 211, 220);
 	         	  
 	         	 for (Button b : buttons) {
