@@ -219,7 +219,7 @@ public class Game extends Canvas {
     private void initEntities() {
     	
         // create the ship and put in center of screen
-        player = new Player(this, "sprites/ship1.png", 70, 650);
+        player = new Player(this, "sprites/animations/idle/idle1.png", 70, 650);
         entities.add(player);
     } // initEntities
     

@@ -18,6 +18,8 @@
     protected Sprite sprite; // this entity's sprite
     protected double dx; // horizontal speed (px/s)  + -> right
     protected double dy; // vertical speed (px/s) + -> down
+    
+
 
     
     protected Rectangle me = new Rectangle(); // bounding rectangle of
@@ -94,8 +96,11 @@
      * Draw this entity to the graphics object provided at (x,y)
      */
      public void draw (Graphics g, int xLvlOffset) {
-       sprite.draw(g,(int)x - xLvlOffset,(int)y);
+    	 sprite.draw(g,(int)x - xLvlOffset,(int)y);
      }  // draw
+     
+     
+     
      
     /* Do the logic associated with this entity.  This method
      * will be called periodically based on game events.

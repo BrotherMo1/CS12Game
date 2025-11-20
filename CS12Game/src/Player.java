@@ -1,3 +1,5 @@
+import java.awt.Graphics;
+
 public class Player extends Entity{
 	
 	private Game game;
@@ -12,6 +14,32 @@ public class Player extends Entity{
 	private long lastDamageTimeSpike = 0;
 	private long damageCooldownSpike = 500; // ms
 	
+	private boolean animationFinished = false;
+	
+	private Sprite[] idleFrames;
+	private Sprite[] runFrames;
+	private Sprite[] jumpFrames;
+	private Sprite[] fallFrames;
+	private Sprite[] portalFrames;
+	private Sprite[] deathFrames;
+	private Sprite[] hurtFrames;
+
+	private int animationIndex = 1;
+	private long lastFrameTime = 0;
+	private long frameSpeed = 80; // ms per frame
+	
+	public enum PlayerState{
+		IDLE,
+		RUN,
+		JUMP,
+		FALL,
+		PORTAL,
+		HURT,
+		DEATH
+	}
+	
+	public PlayerState state = PlayerState.IDLE;
+	
 	// fall dmg
 	private final double FALL_DAMAGE_THRESHOLD = 500;
 
@@ -19,13 +47,138 @@ public class Player extends Entity{
 	    super(r, newX, newY);		
 	    game = g;
 
+	    loadAnimations();
+	    
 	    this.maxHealth = 100;
 	    this.currentHealth = this.maxHealth;
 	    this.healthWidth = game.healthBarWidth;
+	    
 
 	    me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
 	}
+	
+	private void loadAnimations() {
+		idleFrames = loadFrames("sprites/animations/idle/idle", 7); 
+		jumpFrames = loadFrames("sprites/animations/jump/jump", 2);
+		fallFrames = loadFrames("sprites/animations/fall/fall", 3);
+		portalFrames = loadFrames("sprites/animations/portal/portal", 14);
+		runFrames = loadFrames("sprites/animations/run/run", 8);
+		deathFrames = loadFrames("sprites/animations/death/death", 12);
+		hurtFrames = loadFrames("sprites/animations/hurt/hurt", 4);
+		
+	}
+	
+	private void updateAnimationState(){
+	    PlayerState previous = state;
 
+	    // --- Determine State ---
+	    if (game.isShifting()) {
+	        state = PlayerState.PORTAL;
+	    } else if (!onGround) {
+	        if (dy < 0) state = PlayerState.JUMP;
+	        else state = PlayerState.FALL;
+	    } else if (dx != 0) {
+	        state = PlayerState.RUN;
+	    } else {
+	        state = PlayerState.IDLE;
+	    }
+
+	    // --- Reset animation when the state changes ---
+	    if (state != previous) {
+	        animationIndex = 1;
+	        animationFinished = false;
+	        lastFrameTime = System.currentTimeMillis();
+	    }
+	}
+	
+	public Sprite getCurrentAnimationFrame() {
+ 	    switch (state) {
+
+ 	        case IDLE:
+ 	            return idleFrames[animationIndex % idleFrames.length];
+
+ 	        case RUN:
+ 	            return runFrames[animationIndex % runFrames.length];
+
+ 	        case JUMP:
+ 	            return jumpFrames[animationIndex];
+
+ 	        case FALL:
+ 	            return fallFrames[animationIndex];
+
+ 	        case PORTAL:
+ 	            return portalFrames[animationIndex % portalFrames.length];
+ 	            
+ 	        case DEATH:
+ 	        	return deathFrames[animationIndex];
+ 	        case HURT:
+ 	        	return hurtFrames[animationIndex % hurtFrames.length];
+ 	        	
+ 	        default:
+ 	        	break;
+ 	    }
+
+ 	    return idleFrames[0]; 
+ 	}
+	
+	private void updateAnimationFrame() {
+	    long now = System.currentTimeMillis();
+	    if (now - lastFrameTime > frameSpeed) {
+	        lastFrameTime = now;
+
+	        // If the animation should NOT loop
+	        if (state == PlayerState.JUMP || state == PlayerState.FALL) {
+
+	            if (!animationFinished) {
+	                animationIndex++;
+
+	                // Once we reach last frame, stop
+	                int frameCount = getCurrentFrameCount();
+	                if (animationIndex >= frameCount - 1) {
+	                    animationIndex = frameCount - 1;  // stay on last frame
+	                    animationFinished = true;
+	                }
+	            }
+
+	        } else {
+	            // Looping animations
+	            animationIndex++;
+	        }
+	    }
+	}
+	
+	private int getCurrentFrameCount() {
+	    return switch (state) {
+	        case IDLE -> idleFrames.length;
+	        case RUN -> runFrames.length;
+	        case JUMP -> jumpFrames.length;
+	        case FALL -> fallFrames.length;
+	        case PORTAL -> portalFrames.length;
+	        case DEATH -> deathFrames.length;
+	        case HURT -> hurtFrames.length;
+	        default -> throw new IllegalArgumentException("Unexpected value: " + state);
+	    };
+	}
+	
+	@Override
+	public void draw (Graphics g, int xLvlOffset) {
+		Sprite current = getCurrentAnimationFrame();
+   	 	current.draw(g,(int)x - xLvlOffset,(int)y);
+    }  // draw
+	
+	
+	private Sprite[] loadFrames(String location, int count){
+		Sprite[] frames = new Sprite[count];
+		
+		for (int i = 1; i < count; i++) {
+			String ref = (location + i + ".png");
+			frames[i] = SpriteStore.get().getSprite(ref);
+		}
+		
+		return frames;
+	}
+
+	
 	
 	public void dmgChecker() { 
 		
@@ -39,7 +192,7 @@ public class Player extends Entity{
 			takenFallDamage = false;
 		}
 		// check if player falls out of bounds, if true kill them
-		if (y > game.GAME_HEIGHT - 50) {
+		if (y > game.GAME_HEIGHT + 50) {
 			changeHealth(-this.maxHealth);
 	    } // if
 		
@@ -77,9 +230,13 @@ public class Player extends Entity{
     } // takeSpikeDamage
 
 	public void move (long delta){
+		updateAnimationState();
+		updateAnimationFrame();
+		
 		if (game.isShifting()) {
             return;
         }
+		
 	        
 	    if (!onGround) {
 	    	dy += GRAVITY * delta / 1000;
@@ -149,10 +306,12 @@ public class Player extends Entity{
 	
 	
 	public void takeDamage(int amount) {
+		state = PlayerState.HURT;
 	    currentHealth -= amount;
 	    if (currentHealth < 0) currentHealth = 0;
 
 	    if (currentHealth == 0) {
+	    	state = PlayerState.DEATH;
 	        game.notifyDeath();
 	    }
 	}
