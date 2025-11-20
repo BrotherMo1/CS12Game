@@ -10,7 +10,7 @@ public class Player extends Entity{
     private double impactSpeed = 0;
     
 	private long lastDamageTimeSpike = 0;
-	private long damageCooldownSpike = 500; // ms
+	private long damageCooldownSpike = 800; // ms
 	
 	// fall dmg
 	private final double FALL_DAMAGE_THRESHOLD = 500;
@@ -44,7 +44,7 @@ public class Player extends Entity{
 	    } // if
 		
 		for (Spike spike : game.getSpikes()) {
-			if (me.intersects(spike.hitBox)) {
+			if (me.intersects(spike.getHitBox())) {
 				takeSpikeDamage(-10);
 			}
 		}
