@@ -97,6 +97,7 @@
      */
      public void draw (Graphics g, int xLvlOffset) {
     	 sprite.draw(g,(int)x - xLvlOffset,(int)y);
+    	 
      }  // draw
      
      public void printAnimationDebug() {

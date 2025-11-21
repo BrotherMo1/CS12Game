@@ -5,6 +5,8 @@ public class Player extends Entity{
 	private Game game;
     protected double dx = 0;        // Horizontal speed
     protected double dy = 0;        // Vertical speed (gravity)
+    private double nextY = 0;
+    private double nextX = 0;
     private boolean onGround = true;    // Is the player on the ground or a platform?
     private static final double GRAVITY = 1500;  // The strength of gravity
     private static final double JUMP_STRENGTH = -500;  // The strength of the jump
@@ -172,10 +174,14 @@ public class Player extends Entity{
 		Sprite current = getCurrentAnimationFrame();
 		
 		if (dx < 0) {
-			current.Scale(-1, 1);
 		}
 		
-		
+		g.drawRect(
+		        (int) x - xLvlOffset,
+		        (int) y,
+		        me.width,
+		        me.height
+		    );
    	 	current.draw(g, (int)x - xLvlOffset,(int)y);
     }  // draw
 	
@@ -254,8 +260,8 @@ public class Player extends Entity{
             dy += GRAVITY * delta / 1000;
         }
         
-        x += (dx * delta) / 1000;
-        me.setLocation((int)x, (int)y);
+        nextX = x += (dx * delta) / 1000;
+        me.setLocation((int)nextX, (int)y);
         
         // horizontal collisions 
         for (Platform platform : game.getPlatforms()) {
@@ -265,13 +271,12 @@ public class Player extends Entity{
                 } else if (dx < 0) { 
                     x = platform.x + platform.width;
                 }
-                me.setLocation((int)x, (int)y);
                 break;
             }
         }
         
-        y += (dy * delta) / 1000;
-        me.setLocation((int)x, (int)y);
+        nextY = y += (dy * delta) / 1000;
+        me.setLocation((int)x, (int)nextY);
           
         onGround = false;
         
@@ -286,14 +291,13 @@ public class Player extends Entity{
         			}
         			
         			y = platform.y - me.height;
-        			//dy = 0;
+        			dy = 0;
         			onGround = true;
-	             } else if (dy < 0) { // hitting head
-	            	 y = platform.y + platform.height;
+        		} else if (dy < 0) { // hitting head
+        			y = platform.y + platform.height;
 	            	 dy = 0;
-	             }
-	             me.setLocation((int)x, (int)y);
-	             break;
+        		}
+        		break;
 	         }
 	     }
 	
