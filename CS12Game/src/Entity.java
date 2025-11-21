@@ -99,7 +99,9 @@
     	 sprite.draw(g,(int)x - xLvlOffset,(int)y);
      }  // draw
      
-     
+     public void printAnimationDebug() {
+    	   
+    	}
      
      
     /* Do the logic associated with this entity.  This method

@@ -180,6 +180,7 @@ public class Game extends Canvas {
 				
 				initMaps();
 	    		loadMap(0);
+	    		startGame();
 	    
 	    		// start the game
 	    		gameLoop();
@@ -219,7 +220,7 @@ public class Game extends Canvas {
     private void initEntities() {
     	
         // create the ship and put in center of screen
-        player = new Player(this, "sprites/animations/idle/idle1.png", 70, 650);
+        player = new Player(this, "sprites/animations/idle/idle1.png", 70, 550);
         entities.add(player);
     } // initEntities
     
@@ -707,6 +708,7 @@ public class Game extends Canvas {
         	
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+            g.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
             (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
             
             // check for dmg and update health
@@ -746,6 +748,7 @@ public class Game extends Canvas {
                 } // if
 
                 checkCloseToBorder();
+                player.printAnimationDebug();
 
                 // draw all entities
                 for (int i = 0; i < entities.size(); i++) {

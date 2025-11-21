@@ -26,7 +26,7 @@ public class Player extends Entity{
 
 	private int animationIndex = 1;
 	private long lastFrameTime = 0;
-	private long frameSpeed = 80; // ms per frame
+	private long frameSpeed = 100; // ms per frame
 	
 	public enum PlayerState{
 		IDLE,
@@ -41,7 +41,7 @@ public class Player extends Entity{
 	public PlayerState state = PlayerState.IDLE;
 	
 	// fall dmg
-	private final double FALL_DAMAGE_THRESHOLD = 500;
+	private final double FALL_DAMAGE_THRESHOLD = 800;
 
 	public Player(Game g, String r, int newX, int newY) {
 	    super(r, newX, newY);		
@@ -55,6 +55,14 @@ public class Player extends Entity{
 	    
 
 	    me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
+	}
+	
+	public void printAnimationDebug() {
+	    System.out.println("State: " + state + 
+	                      ", Index: " + animationIndex + 
+	                      ", Finished: " + animationFinished +
+	                      ", dy: " + dy + 
+	                      ", onGround: " + onGround);
 	}
 	
 	private void loadAnimations() {
@@ -76,19 +84,18 @@ public class Player extends Entity{
 	        state = PlayerState.PORTAL;
 	    } else if (!onGround) {
 	        if (dy < 0) state = PlayerState.JUMP;
-	        else state = PlayerState.FALL;
-	    } else if (dx != 0) {
+	        else if (dy > 0) state = PlayerState.FALL;
+	    }  else if (Math.abs(dx) > 0.1) {  // Small threshold to prevent jitter
 	        state = PlayerState.RUN;
 	    } else {
 	        state = PlayerState.IDLE;
 	    }
 
-	    // --- Reset animation when the state changes ---
 	    if (state != previous) {
 	        animationIndex = 1;
 	        animationFinished = false;
 	        lastFrameTime = System.currentTimeMillis();
-	    }
+	    } // if
 	}
 	
 	public Sprite getCurrentAnimationFrame() {
@@ -118,7 +125,7 @@ public class Player extends Entity{
  	        	break;
  	    }
 
- 	    return idleFrames[0]; 
+ 	    return idleFrames[1]; 
  	}
 	
 	private void updateAnimationFrame() {
@@ -163,15 +170,21 @@ public class Player extends Entity{
 	@Override
 	public void draw (Graphics g, int xLvlOffset) {
 		Sprite current = getCurrentAnimationFrame();
-   	 	current.draw(g,(int)x - xLvlOffset,(int)y);
+		
+		if (dx < 0) {
+			current.Scale(-1, 1);
+		}
+		
+		
+   	 	current.draw(g, (int)x - xLvlOffset,(int)y);
     }  // draw
 	
 	
 	private Sprite[] loadFrames(String location, int count){
 		Sprite[] frames = new Sprite[count];
 		
-		for (int i = 1; i < count; i++) {
-			String ref = (location + i + ".png");
+		for (int i = 0; i < count; i++) {
+			String ref = (location + (i + 1) + ".png");
 			frames[i] = SpriteStore.get().getSprite(ref);
 		}
 		
@@ -192,7 +205,7 @@ public class Player extends Entity{
 			takenFallDamage = false;
 		}
 		// check if player falls out of bounds, if true kill them
-		if (y > game.GAME_HEIGHT + 50) {
+		if (y > game.GAME_HEIGHT - 50) {
 			changeHealth(-this.maxHealth);
 	    } // if
 		
@@ -229,68 +242,66 @@ public class Player extends Entity{
         changeHealth(value);
     } // takeSpikeDamage
 
-	public void move (long delta){
-		updateAnimationState();
-		updateAnimationFrame();
-		
-		if (game.isShifting()) {
+    public void move (long delta){
+    	updateAnimationState();
+        updateAnimationFrame();
+        
+        if (game.isShifting()) {
             return;
         }
-		
-	        
-	    if (!onGround) {
-	    	dy += GRAVITY * delta / 1000;
-	    } else {
-	    	dy = 0;
-	    }
-	    x += (dx * delta) / 1000;
-	    me.setLocation((int)x, (int)y);
-	    
-	    
-		// horizontal collisions 
-	    for (Platform platform : game.getPlatforms()) {
-	    	if (me.intersects(platform.hitBox)) {
-	    		if (dx > 0) { 
-	    			x = platform.x - me.width;
-	    		} else if (dx < 0) { 
-	    			x = platform.x + platform.width;
-	    		}
-	    		me.setLocation((int)x, (int)y);
-	            break;
-	          }
-	    }
-	    y += (dy * delta) / 1000;
-	    me.setLocation((int)x, (int)y);
-	      
-	    // vertical collisions
-	    onGround = false;
-	    for (Platform platform : game.getPlatforms()) {
-	    	if (me.intersects(platform.hitBox)) {
-	    		if (dy > 0) { 
-	    			
-	    			impactSpeed = dy;
-	    			if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
-//	    		    	        int damage = (int)(impactSpeed - FALL_DAMAGE_THRESHOLD) * 2;
-	    				int damage = -10;
-	    				changeHealth(damage);
-	    				takenFallDamage = true;
-	    			} // if 
-	    			
-	    			
-	    			y = platform.y - me.height;
-	    			dy = 0;
-	    			onGround = true;
-	    		} else if (dy < 0) {
-	    			y = platform.y + platform.height;
-	    			dy = 0;
-	    		}
-	    		me.setLocation((int)x, (int)y);
-	    		break;
-	    	}
-	    }
-	    
-	    me.setLocation((int)x, (int)y);
-	} // move
+            
+        if (!onGround) {
+            dy += GRAVITY * delta / 1000;
+        }
+        
+        x += (dx * delta) / 1000;
+        me.setLocation((int)x, (int)y);
+        
+        // horizontal collisions 
+        for (Platform platform : game.getPlatforms()) {
+            if (me.intersects(platform.hitBox)) {
+                if (dx > 0) { 
+                    x = platform.x - me.width;
+                } else if (dx < 0) { 
+                    x = platform.x + platform.width;
+                }
+                me.setLocation((int)x, (int)y);
+                break;
+            }
+        }
+        
+        y += (dy * delta) / 1000;
+        me.setLocation((int)x, (int)y);
+          
+        onGround = false;
+        
+        // check collision below
+        for (Platform platform : game.getPlatforms()) {
+        	if (me.intersects(platform.hitBox)) {
+        		if (dy >= 0) { // falling
+        			impactSpeed = dy;
+        			if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
+        				changeHealth(-10);
+        				takenFallDamage = true;
+        			}
+        			
+        			y = platform.y - me.height;
+        			//dy = 0;
+        			onGround = true;
+	             } else if (dy < 0) { // hitting head
+	            	 y = platform.y + platform.height;
+	            	 dy = 0;
+	             }
+	             me.setLocation((int)x, (int)y);
+	             break;
+	         }
+	     }
+	
+	     // Set onGround once
+        
+	     me.setLocation((int)x, (int)y);
+        
+    } // move
 	
 	public boolean isOnGround() {
 		  return onGround;
