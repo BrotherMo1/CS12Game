@@ -83,7 +83,7 @@ public class Player extends Entity{
 
 	    // --- Determine State ---
 	    if (game.isShifting()) {
-	        state = PlayerState.PORTAL;
+	        state = PlayerState.PORTAL; 
 	    } else if (!onGround) {
 	        if (dy < 0) state = PlayerState.JUMP;
 	        else if (dy > 0) state = PlayerState.FALL;
@@ -255,34 +255,46 @@ public class Player extends Entity{
         if (game.isShifting()) {
             return;
         }
-            
+        
         if (!onGround) {
-            dy += GRAVITY * delta / 1000;
+        	dy += GRAVITY * delta / 1000;
         }
+            
         
-        nextX = x += (dx * delta) / 1000;
-        me.setLocation((int)nextX, (int)y);
         
+        x += (dx * delta) / 1000;
+	     me.setLocation((int)x, (int)y);
+
+	     System.out.println("x:" + x + " y:" +y);
+        
+        
+        onGround = false;
         // horizontal collisions 
         for (Platform platform : game.getPlatforms()) {
             if (me.intersects(platform.hitBox)) {
                 if (dx > 0) { 
                     x = platform.x - me.width;
+           	     me.setLocation((int)x, (int)y);
+
                 } else if (dx < 0) { 
                     x = platform.x + platform.width;
+           	     me.setLocation((int)x, (int)y);
+
                 }
                 break;
             }
         }
         
-        nextY = y += (dy * delta) / 1000;
-        me.setLocation((int)x, (int)nextY);
-          
-        onGround = false;
+        me.setLocation((int)x, (int)y);
         
+        y += (dy * delta) / 1000;
+
+        me.setLocation((int)x, (int)y);
+                  
         // check collision below
         for (Platform platform : game.getPlatforms()) {
         	if (me.intersects(platform.hitBox)) {
+	
         		if (dy >= 0) { // falling
         			impactSpeed = dy;
         			if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
@@ -293,9 +305,13 @@ public class Player extends Entity{
         			y = platform.y - me.height;
         			dy = 0;
         			onGround = true;
+        		    me.setLocation((int)x, (int)y);
+
         		} else if (dy < 0) { // hitting head
         			y = platform.y + platform.height;
 	            	 dy = 0;
+	        	     me.setLocation((int)x, (int)y);
+
         		}
         		break;
 	         }
@@ -303,8 +319,10 @@ public class Player extends Entity{
 	
 	     // Set onGround once
         
+        
 	     me.setLocation((int)x, (int)y);
         
+	     
     } // move
 	
 	public boolean isOnGround() {
