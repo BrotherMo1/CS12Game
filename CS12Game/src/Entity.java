@@ -63,7 +63,7 @@
      }
      
      public boolean isOnGround() {
-    	 return true;
+    	 return isOnGround();
      }
 
      // get and set velocities

@@ -248,82 +248,72 @@ public class Player extends Entity{
         changeHealth(value);
     } // takeSpikeDamage
 
-    public void move (long delta){
-    	updateAnimationState();
+    public void move(long delta) {
+        updateAnimationState();
         updateAnimationFrame();
-        
-        if (game.isShifting()) {
-            return;
-        }
-        
-        if (!onGround) {
-        	dy += GRAVITY * delta / 1000;
-        }
-            
-        
-        
-        x += (dx * delta) / 1000;
-	     me.setLocation((int)x, (int)y);
 
-	     System.out.println("x:" + x + " y:" +y);
-        
-        
-        onGround = false;
-        // horizontal collisions 
+        if (game.isShifting()) return;
+
+        // Horizontal movement
+        x += (dx * delta) / 1000.0;
+        me.setLocation((int)x, (int)y);
+
+        // Horizontal collisions
         for (Platform platform : game.getPlatforms()) {
             if (me.intersects(platform.hitBox)) {
-                if (dx > 0) { 
-                    x = platform.x - me.width;
-           	     me.setLocation((int)x, (int)y);
-
-                } else if (dx < 0) { 
-                    x = platform.x + platform.width;
-           	     me.setLocation((int)x, (int)y);
-
-                }
+                if (dx > 0) x = platform.x - me.width;
+                else if (dx < 0) x = platform.x + platform.width;
+                me.setLocation((int)x, (int)y);
                 break;
             }
         }
-        
-        me.setLocation((int)x, (int)y);
-        
-        y += (dy * delta) / 1000;
 
+        // Apply gravity
+        if (!onGround) dy += GRAVITY * delta / 1000.0;
+
+        // Vertical movement
+        y += (dy * delta) / 1000.0;
         me.setLocation((int)x, (int)y);
-                  
-        // check collision below
+
+        // Vertical collisions
         for (Platform platform : game.getPlatforms()) {
-        	if (me.intersects(platform.hitBox)) {
-	
-        		if (dy >= 0) { // falling
-        			impactSpeed = dy;
-        			if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
-        				changeHealth(-10);
-        				takenFallDamage = true;
-        			}
-        			
-        			y = platform.y - me.height;
-        			dy = 0;
-        			onGround = true;
-        		    me.setLocation((int)x, (int)y);
+            if (me.intersects(platform.hitBox)) {
+                if (dy > 0) { // falling
+                    impactSpeed = dy;
+                    if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
+                        changeHealth(-10);
+                        takenFallDamage = true;
+                    }
+                    y = platform.y - me.height;
+                    dy = 0;
+                    me.setLocation((int)x, (int)y);
+                } else if (dy < 0) { // hitting head
+                    y = platform.y + platform.height;
+                    dy = 0;
+                    me.setLocation((int)x, (int)y);
+                }
+            }
+        }
 
-        		} else if (dy < 0) { // hitting head
-        			y = platform.y + platform.height;
-	            	 dy = 0;
-	        	     me.setLocation((int)x, (int)y);
+        // STABLE onGround CHECK
+        boolean grounded = false;
+        for (Platform platform : game.getPlatforms()) {
+            boolean horizontalMatch = x + me.width > platform.x && x < platform.x + platform.width;
+            boolean feetClose = Math.abs((y + me.height) - platform.y) <= 2.0; // 2px tolerance
+            if (horizontalMatch && feetClose) {
+                grounded = true;
+                break;
+            }
+        }
+        onGround = grounded;
 
-        		}
-        		break;
-	         }
-	     }
-	
-	     // Set onGround once
-        
-        
-	     me.setLocation((int)x, (int)y);
-        
-	     
+        if (onGround) takenFallDamage = false;
+
+        me.setLocation((int)x, (int)y);
     } // move
+
+
+
 	
 	public boolean isOnGround() {
 		  return onGround;
