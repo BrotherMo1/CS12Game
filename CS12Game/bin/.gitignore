@@ -1,4 +1,6 @@
-/Player$PlayerState.class
+/Game$1.class
+/Game$KeyInputHandler.class
+/Game$MouseInputHandler.class
+/Game.class
+/ShotEntity.class
 /sprites/
-/Spike.class
-/Platform.class

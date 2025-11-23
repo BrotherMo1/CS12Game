@@ -92,10 +92,12 @@ public class Game extends Canvas {
 
     private ArrayList < Button > buttons = new ArrayList < > ();
 
-    private Button backButton;
-    private Button retryButton;
-    private Button continueButton;
-    
+	private Button backButton;
+	private Button retryButton;
+	private Button continueButton;
+	private Button continueButton2;
+	private Button backButton2;
+	
     private long gameStartTime = 0;
     private long gameEndTime = 0;
     private boolean timerRunning = false;
@@ -111,6 +113,7 @@ public class Game extends Canvas {
 	private int statusBarX = (int) (10 * Game.SCALE);
 	private int statusBarY = (int) (10 * Game.SCALE);
 
+	private boolean dead = false;
 	
     /*
      * Construct our game and set it running.
@@ -162,16 +165,22 @@ public class Game extends Canvas {
         strategy = getBufferStrategy();
 
         Button startButton = new Button("sprites/playButton.png", "sprites/playButtonHover.png", 60, 350);
-	    Button quitButton = new Button("sprites/quitButton.png", "sprites/quitButtonHover.png", 60, 550);
-	    backButton = new Button("sprites/backButton.png", "sprites/backButtonHover.png", GAME_WIDTH / 2 - 50, 550);
-	    retryButton = new Button("sprites/retryButton.png", "sprites/retryButtonHover.png",GAME_WIDTH / 2 - 50, 410);
-	    continueButton = new Button("sprites/continueButton.png", "sprites/continueButtonHover.png", GAME_WIDTH / 2 - 50, 275);
-	    
-	    buttons.add(backButton);	
-	    buttons.add(retryButton);
-	    buttons.add(continueButton);
-	    buttons.add(startButton);
-	    buttons.add(quitButton);
+		Button quitButton = new Button("sprites/quitButton.png", "sprites/quitButtonHover.png", 60, 550);
+		backButton = new Button("sprites/backButton.png", "sprites/backButtonHover.png", GAME_WIDTH / 2 - 50, 550);
+		retryButton = new Button("sprites/retryButton.png", "sprites/retryButtonHover.png", GAME_WIDTH / 2 - 50, 410);
+		continueButton = new Button("sprites/continueButton.png", "sprites/continueButtonHover.png",
+				GAME_WIDTH / 2 - 50, 275);
+		continueButton2 = new Button("sprites/continueButton2.png", "sprites/continueButtonHover2.png",
+				GAME_WIDTH / 2 + 60, 420);
+		backButton2 = new Button("sprites/backButton2.png", "sprites/backButtonHover2.png", GAME_WIDTH / 2 - 160, 420);
+
+		buttons.add(backButton);
+		buttons.add(retryButton);
+		buttons.add(continueButton);
+		buttons.add(continueButton2);
+		buttons.add(backButton2);
+		buttons.add(startButton);
+		buttons.add(quitButton);
 
 		while(true) {
 			startMenu();
@@ -195,19 +204,20 @@ public class Game extends Canvas {
  		private void startMenu() {
  			
  			Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
- 		    
+
  			(SpriteStore.get()).getSprite("sprites/bg.png").draw(g, 0, 0);
  			(SpriteStore.get()).getSprite("sprites/menu_background.png").draw(g, 5, 250);
- 		    		   
- 		 
- 	       for(Button b : buttons) {
- 	    	   if(b.getButtonType() == "sprites/continueButton.png" || b.getButtonType() == "sprites/retryButton.png" || b.getButtonType() == "sprites/backButton.png") {
- 		    	   continue;
- 	    	   } // if		    	
- 	    	   b.draw(g);
- 	       } // for
- 		                      
- 		    strategy.show();
+
+ 			for (Button b : buttons) {
+ 				if (b.getButtonType() == "sprites/continueButton.png" || b.getButtonType() == "sprites/retryButton.png"
+ 						|| b.getButtonType() == "sprites/backButton.png" || b.getButtonType() == "sprites/backButton2.png"
+ 						|| b.getButtonType() == "sprites/continueButton2.png") {
+ 					continue;
+ 				} // if
+ 				b.draw(g);
+ 			} // for
+
+ 			strategy.show();
  			
  		} // startMenu
 
@@ -233,7 +243,7 @@ public class Game extends Canvas {
             return 0;
         } // if
         return maps.get(index)[0].length;
-    }
+    } // getMapWidth
 
     private void loadMap(int index) {
         if (index < 0 || index >= maps.size()) {
@@ -241,7 +251,7 @@ public class Game extends Canvas {
         } // if
         platforms = makePlatforms(maps.get(index));
         spikes = makeSpikes(maps.get(index));
-    }
+    } // loadMap
 
     private void checkCloseToBorder() {
         int playerX = player.getX();
@@ -258,7 +268,7 @@ public class Game extends Canvas {
         } else if (xLvlOffset < 0) {
             xLvlOffset = 0;
         }
-    }
+    } // checkCloseToBorder
 
 	private void initMaps() {
 
@@ -574,39 +584,41 @@ public class Game extends Canvas {
     /* Notification that the player has died.
      */
 
-    public void notifyDeath() {
-        message = "You lost and DEAD!  Try again?";
-        waitingForKeyPress = true;
-    } // notifyDeath
+	public void notifyDeath() {
+		dead = true;
+		if (timerRunning) {
+			timerRunning = false;
+			gameEndTime = System.currentTimeMillis();
+		}
+	} // notifyDeath
 
-
-    /* Notification that the play has killed all aliens
-     */
-    public void notifyWin() {
-        message = "Hoorauy you won!  You win!";
-        waitingForKeyPress = true;
-    } // notifyWin
+	/*
+	 * Notification that the play has killed all aliens
+	 */
+	public void notifyWin() {
+		gameRunning = false;
+	} // notifyWin
 
     /* Notification than an alien has been killed
      */
-    public void notifyAlienKilled() {
-        alienCount--;
 
-        if (alienCount == 0) {
-            notifyWin();
-        } // if
+	public void notifyAlienKilled() {
+		alienCount--;
 
-        // speed up existing aliens
-        for (int i = 0; i < entities.size(); i++) {
-            Entity entity = (Entity) entities.get(i);
-            if (entity instanceof AlienEntity) {
-                // speed up by 2%
-                entity.setHorizontalMovement(entity.getHorizontalMovement() * 1.04);
-            } // if
-        } // for
-    } // notifyAlienKilled
+		if (alienCount == 0) {
+			notifyWin();
+		} // if
 
-
+		// speed up existing aliens
+		for (int i = 0; i < entities.size(); i++) {
+			Entity entity = (Entity) entities.get(i);
+			if (entity instanceof AlienEntity) {
+				// speed up by 2%
+				entity.setHorizontalMovement(entity.getHorizontalMovement() * 1.04);
+			} // if
+		} // for
+	} // notifyAlienKilled
+	
     /* Attempt to fire.*/
     public void tryToFire() {
         // check that we've waited long enough to fire
@@ -641,22 +653,23 @@ public class Game extends Canvas {
     } // tryToFire
 
     
-    public void resetGame() {
-    	playing = false;
+	public void resetGame() {
+		playing = false;
 		gameRunning = false;
 		entities.clear();
 		removeEntities.clear();
 		leftPressed = false;
-        rightPressed = false;
-        firePressed = false;
-        upPressed = false;
-        shifted = false;
+		rightPressed = false;
+		firePressed = false;
+		upPressed = false;
+		shifted = false;
 		paused = false;
+		dead = false;
 		currentMap = 0;
-	    player.healthWidth = healthBarWidth;
+		player.healthWidth = healthBarWidth;
 		player.updateHealthBar();
-		
-    } // resetGame
+
+	} // resetGame
 
     
     // helper method to determine if a collision occurs
@@ -730,40 +743,50 @@ public class Game extends Canvas {
         	    } // if
         	 
             	long currentTimer = System.currentTimeMillis();
-    		 	long elapsedTime = timerRunning ? currentTimer - gameStartTime - totalPausedTime : gameEndTime - gameStartTime;
+				long elapsedTime;
 
-           	 	long hours = elapsedTime / 3600000;
-           	 	long minutes = (elapsedTime % 3600000) / 60000;
-           	  	long seconds = (elapsedTime % 60000) / 1000;
-           	  	long milliseconds = elapsedTime % 1000;
-           	  
-           	  	message = String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
-           	  	
-           	  	// move each entity
-                if (!waitingForKeyPress) {
-                    for (int i = 0; i < entities.size(); i++) {
-                        Entity entity = (Entity) entities.get(i);
-                        entity.move(delta);
-                    } // for
-                } // if
+				if (dead) {
+					// When dead, use the time up to death
+					elapsedTime = gameEndTime - gameStartTime - totalPausedTime;
+				} else if (paused) {
+					// When paused, use the time up to when pause started
+					elapsedTime = pauseStartTime - gameStartTime - totalPausedTime;
+				} else {
+					// When running normally
+					elapsedTime = currentTimer - gameStartTime - totalPausedTime;
+				} // else
 
-                checkCloseToBorder();
-                player.printAnimationDebug();
+				long hours = elapsedTime / 3600000;
+				long minutes = (elapsedTime % 3600000) / 60000;
+				long seconds = (elapsedTime % 60000) / 1000;
+				long milliseconds = elapsedTime % 1000;
 
-                // draw all entities
-                for (int i = 0; i < entities.size(); i++) {
-                    Entity entity = (Entity) entities.get(i);
-                    entity.draw(g, xLvlOffset);
-                } // for
+				message = String.format("%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
 
-                for (Platform platform : platforms) platform.draw(g, xLvlOffset);
-                for (Spike spike : spikes) spike.draw(g, xLvlOffset);
+				
+					for (int i = 0; i < entities.size(); i++) {
+						Entity entity = (Entity) entities.get(i);
+						entity.move(delta);
+					} // for
 
-                collisionChecker();
+				checkCloseToBorder();
 
-                // remove dead entities
-                entities.removeAll(removeEntities);
-                removeEntities.clear();
+				// draw all entities
+				for (int i = 0; i < entities.size(); i++) {
+					Entity entity = (Entity) entities.get(i);
+					entity.draw(g, xLvlOffset);
+				} // for
+
+				for (Platform platform : platforms)
+					platform.draw(g, xLvlOffset);
+				for (Spike spike : spikes)
+					spike.draw(g, xLvlOffset);
+
+				collisionChecker();
+
+				// remove dead entities
+				entities.removeAll(removeEntities);
+				removeEntities.clear();
 
                 // run logic if required
                 if (logicRequiredThisLoop) {
@@ -786,6 +809,21 @@ public class Game extends Canvas {
                 g.setFont(new Font("Arial", Font.BOLD, 30));
                 g.drawString("Time: " + message, GAME_WIDTH / 2 - 150, 30);
 
+				if (dead) {
+					(SpriteStore.get()).getSprite("sprites/death_screen.png").draw(g, GAME_WIDTH / 2 - 250, 200);
+
+					for (Button b : buttons) {
+						if (b.getButtonType() == "sprites/playButton.png"
+								|| b.getButtonType() == "sprites/quitButton.png"
+								|| b.getButtonType() == "sprites/continueButton.png"
+								|| b.getButtonType() == "sprites/backButton.png"
+								|| b.getButtonType() == "sprites/retryButton.png") {
+							continue;
+						} // if
+						b.draw(g);
+					} // for
+				} // if
+                
                 // clear graphics and flip buffer
                 g.dispose();
                 strategy.show();
@@ -800,8 +838,8 @@ public class Game extends Canvas {
                     if (currentTime - lastShiftTime >= SHIFT_DELAY) {
                         shiftStartTime = currentTime;
                         shifting = true;
-                    }
-                }
+                    } // if
+                } // if
 
                 if (shifting) {
 
@@ -818,21 +856,23 @@ public class Game extends Canvas {
                     } if (elapsed >= SHIFT_DURATION * 2) {
                         shifting = false;
                         lastShiftTime = currentTime;
-                    }
-                }
+                    } // if
+                } // if shifting
 
-                // respond to user moving ship
-                if ((leftPressed) && (!rightPressed)) {
-                    player.setHorizontalMovement(-300);
-                } else if ((rightPressed) && (!leftPressed)) {
-                    player.setHorizontalMovement(300);
-                } else {
-                    player.setHorizontalMovement(0);
-                }
+                if (!dead) {
+					// respond to user moving ship
+					if ((leftPressed) && (!rightPressed)) {
+						player.setHorizontalMovement(-300);
+					} else if ((rightPressed) && (!leftPressed)) {
+						player.setHorizontalMovement(300);
+					} else {
+						player.setHorizontalMovement(0);
+					} // else
 
-                if (upPressed) {
-                    player.jump();
-                }
+					if (upPressed) {
+						player.jump();
+					} // if
+				}
 
                 // if spacebar pressed, try to fire
                 if (firePressed && player.isOnGround()) {
@@ -872,13 +912,15 @@ public class Game extends Canvas {
 	         	 (SpriteStore.get()).getSprite("sprites/pause.png").draw(g, GAME_WIDTH / 2 - 200, 100);
 	         	 (SpriteStore.get()).getSprite("sprites/menu_background.png").draw(g, GAME_WIDTH / 2 - 211, 220);
 	         	  
-	         	 for (Button b : buttons) {
-	         		 if (b.getButtonType() == "sprites/playButton.png" || b.getButtonType() == "sprites/quitButton.png") {
-	         			 continue;
-	         		 } // if
-	         		 b.draw(g);
-	         	 } // for
-	         	   	          
+					for (Button b : buttons) {
+						if (b.getButtonType() == "sprites/playButton.png" || b.getButtonType() == "sprites/quitButton.png"
+								|| b.getButtonType() == "sprites/continueButton2.png"
+								|| b.getButtonType() == "sprites/backButton2.png") {
+							continue;
+						} // if
+						b.draw(g);
+					} // for
+					
 	          	  g.dispose();
 	          	  strategy.show();
             } // else
@@ -905,27 +947,27 @@ public class Game extends Canvas {
      * output: none
      * purpose: start a fresh game, clear old data
      */
-    private void startGame() {
-        // clear out any existing entities and initalize a new set
-        entities.clear();
+	private void startGame() {
+		// clear out any existing entities and initalize a new set
+		entities.clear();
 
-        initEntities();
-        
-        // blank out any keyboard settings that might exist
-        currentMap = 0;
-        loadMap(currentMap);
-        leftPressed = false;
-        rightPressed = false;
-        firePressed = false;
-        upPressed = false;
-        paused = false;
-        
-        gameStartTime = System.currentTimeMillis();
-        timerRunning = true;
-	    player.healthWidth = healthBarWidth;
-        player.updateHealthBar();
-        
-    } // startGame
+		initEntities();
+
+		// blank out any keyboard settings that might exist
+		currentMap = 0;
+		loadMap(currentMap);
+		leftPressed = false;
+		rightPressed = false;
+		firePressed = false;
+		upPressed = false;
+		paused = false;
+		dead = false;
+		gameStartTime = System.currentTimeMillis();
+		timerRunning = true;
+		player.healthWidth = healthBarWidth;
+		player.updateHealthBar();
+
+	} // startGame
 
 	private void retryLevel() {
 		entities.clear();
@@ -938,10 +980,17 @@ public class Game extends Canvas {
 		firePressed = false;
 		upPressed = false;
 		paused = false;
-	    player.healthWidth = healthBarWidth;
-        player.updateHealthBar();
+		dead = false;
+		player.healthWidth = healthBarWidth;
+		player.updateHealthBar();
 		loadMap(currentMap);
 
+		if (!timerRunning) {
+			timerRunning = true;
+			// Adjust gameStartTime to account for the elapsed time so far
+			long currentElapsed = gameEndTime - gameStartTime - totalPausedTime;
+			gameStartTime = System.currentTimeMillis() - currentElapsed - totalPausedTime;
+		} // if
 	} // retryLevel
 
     /* inner class KeyInputHandler
@@ -990,10 +1039,9 @@ public class Game extends Canvas {
                 } // if
             }
 
-            if (e.getKeyCode() == KeyEvent.VK_P) {
-                if (!paused) paused = true;
-                else paused = false;
-            } // if
+			if (e.getKeyCode() == KeyEvent.VK_P || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+				paused = !paused;
+			} // if
 
         } // keyPressed
 
@@ -1049,29 +1097,32 @@ public class Game extends Canvas {
 
     private class MouseInputHandler implements MouseListener, MouseMotionListener {
    	 
-     	public void mouseClicked(MouseEvent e) {
-     		for (Button mb : buttons) {
-					if (isIn(e, mb)) {
-						if(mb.getButtonType().equals("sprites/playButton.png")) {
-							playing = true;
-							gameRunning = true;
-							startGame();
-							break;
-						} else if(mb.getButtonType().equals("sprites/quitButton.png")) {
-							System.exit(0);
-						} else if (mb.getButtonType().equals("sprites/backButton.png")) {
-							resetGame();
-							break;
-						} else if (mb.getButtonType().equals("sprites/continueButton.png")) {
-							paused = false;
-						}  else if (mb.getButtonType().equals("sprites/retryButton.png")) {
-							retryLevel();
-						} // else if
-						
-					} // if
-				} // for
-     		
-     	} // mouseClicked
+		public void mouseClicked(MouseEvent e) {
+			for (Button mb : buttons) {
+				if (isIn(e, mb)) {
+					if (mb.getButtonType().equals("sprites/playButton.png")) {
+						playing = true;
+						gameRunning = true;
+						waitingForKeyPress = false;
+						startGame();
+						break;
+					} else if (mb.getButtonType().equals("sprites/quitButton.png")) {
+						System.exit(0);
+					} else if (mb.getButtonType().equals("sprites/backButton.png")
+							|| mb.getButtonType().equals("sprites/backButton2.png")) {
+						resetGame();
+						break;
+					} else if (mb.getButtonType().equals("sprites/continueButton.png")) {
+						paused = false;
+					} else if (mb.getButtonType().equals("sprites/retryButton.png")
+							|| mb.getButtonType().equals("sprites/continueButton2.png")) {
+						retryLevel();
+					} // else if
+
+				} // if
+			} // for
+
+		} // mouseClicked
 
 			@Override
 			public void mouseDragged(MouseEvent e) {} // mouseDragged
