@@ -12,8 +12,7 @@ public class Button {
 	private String buttonType;
 	private Rectangle bounds;
 	private boolean mouseOver;
-	
-	
+
 	// for button with picture
 	public Button(String r, String s, int x, int y) {
 		this.normalSprite = (SpriteStore.get()).getSprite(r);
@@ -23,19 +22,18 @@ public class Button {
 		this.width = normalSprite.getWidth();
 		this.height = normalSprite.getHeight();
 		buttonType = r;
-		
+
 		initBounds();
 	} // Main Constructor
-	
-	
+
 	private void initBounds() {
 		bounds = new Rectangle(x, y, normalSprite.getWidth(), normalSprite.getHeight());
 	}
-	
+
 	public Rectangle getBounds() {
 		return bounds;
 	}
-	
+
 	public void draw(Graphics g) {
 		if (mouseOver) {
 			hoveredSprite.draw(g, x, y);
@@ -43,42 +41,37 @@ public class Button {
 			normalSprite.draw(g, x, y);
 		} // else
 	} // draw
-	
-	
+
 	public int getX() {
-		 return x;
-	} //getX
-	
+		return x;
+	} // getX
+
 	public int getY() {
-		 return y;
+		return y;
 	} // getY
-	
+
 	public int getWidth() {
-		 return width;
+		return width;
 	} // getWidth
-	
+
 	public int getHeight() {
-		 return height;
+		return height;
 	} // getHeight
-	
-	
+
 	public Sprite gethoveredSprite() {
 		return hoveredSprite;
 	} // gethoveredSprite
-	
+
 	public Sprite getNormalSprite() {
 		return normalSprite;
 	} // getNormalSprite
-	
 
 	public String getButtonType() {
 		return buttonType;
 	} // getButtonType
-	
+
 	public void setMouseOver(boolean mouseOver) {
 		this.mouseOver = mouseOver;
 	}
-	
-	
-	
+
 } // class Button

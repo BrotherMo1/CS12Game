@@ -171,7 +171,8 @@ public class Player extends Entity {
 		int drawWidth = (int) (current.getWidth() * Game.SCALE);
 		int drawHeight = (int) (current.getHeight() * Game.SCALE);
 		if (!facingRight) {
-			g.drawImage(current.getImage(), drawX + (int) (sprite.getWidth() * Game.SCALE), // shift for flip
+			g.drawImage(current.getImage(), drawX + (int) (sprite.getWidth()
+					* Game.SCALE), // shift for flip
 					drawY, -drawWidth, drawHeight, null);
 		} else {
 			g.drawImage(current.getImage(), drawX, drawY, drawWidth, drawHeight, null);

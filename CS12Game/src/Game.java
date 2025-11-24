@@ -559,8 +559,8 @@ public class Game extends Canvas {
 		// Reset level scrolling
 		xLvlOffset = 0;
 
-		if (shifted)
-			shifted = !shifted;
+		if (shiftedState)
+			shiftedState = false;
 	} // goToNextLevel
 
 	public ArrayList<Platform> getPlatforms() {
@@ -621,6 +621,7 @@ public class Game extends Canvas {
 		shifted = false;
 		paused = false;
 		dead = false;
+		shiftedState = false;
 		currentMap = 0;
 		player.healthWidth = healthBarWidth;
 		player.updateHealthBar();
@@ -687,7 +688,7 @@ public class Game extends Canvas {
 			g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, player.healthWidth, healthBarHeight);
 			g.setColor(Color.white);
 			String health = player.currentHealth + "%";
-			g.drawString(health, healthBarYStart, player.healthWidth);
+			g.drawString(health, player.healthWidth + 85, healthBarYStart + 25);
 
 			if (!paused) {
 
