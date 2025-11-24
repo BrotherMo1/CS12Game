@@ -65,7 +65,7 @@ public class Game extends Canvas {
 	private long alienFiringInterval = 500;
 	private int alienCount; // # of aliens left on screen
 	private long lastShiftTime = 0;
-	private final long SHIFT_DELAY = 1000; // ms
+	private final long SHIFT_DELAY = 0; // ms
 	private boolean shifting = false;
 	private long shiftStartTime = 0;
 	private static final long SHIFT_DURATION = 1000; // 1 second per phase
@@ -685,6 +685,9 @@ public class Game extends Canvas {
 			// draw health bar
 			g.setColor(Color.red);
 			g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, player.healthWidth, healthBarHeight);
+			g.setColor(Color.white);
+			String health = player.currentHealth + "%";
+			g.drawString(health, healthBarYStart, player.healthWidth);
 
 			if (!paused) {
 
@@ -744,7 +747,6 @@ public class Game extends Canvas {
 				// run logic if required
 				if (logicRequiredThisLoop) {
 					for (int i = 0; i < entities.size(); i++) {
-						// Entity entity = (Entity) entities.get(i);
 						Entity entity = entities.get(i);
 						entity.doLogic();
 					} // for

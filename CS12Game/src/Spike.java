@@ -3,13 +3,14 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Spike {
-	int TILE_SIZE = 50;
-	int x;
-	int y;
-	int width;
-	int height;
+	private int TILE_SIZE = 50;
+	private int x;
+	private int y;
+	private int width;
+	private int height;
 
-	Rectangle hitBox;
+	private Rectangle hitBox;
+	private Sprite spikeSprite; // Add this to store the sprite
 
 	public Spike(int x, int y, int TILES_DEFAULT_SIZE, int height) {
 
@@ -18,15 +19,22 @@ public class Spike {
 		this.width = TILES_DEFAULT_SIZE;
 		this.height = TILES_DEFAULT_SIZE / 2;
 
+		loadSpikeImage(); // This should set the spikeSprite
+
 		hitBox = new Rectangle(x, y + (TILES_DEFAULT_SIZE / 2), TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE / 2);
-	} // Platform
+	} // Spike constructor
 
 	public void draw(Graphics2D gtd, int xLvlOffset) {
-		gtd.setColor(Color.RED);
-		gtd.fillRect(x - xLvlOffset, y, width, height);
-		gtd.setColor(Color.DARK_GRAY);
-		gtd.drawRect(x - xLvlOffset, y, width, height);
+		// Draw the actual sprite image instead of a colored rectangle
+		if (spikeSprite != null) {
+			spikeSprite.draw(gtd, x - xLvlOffset, y - 20);
+		} // if
 	} // draw
+
+	private void loadSpikeImage() {
+		// Store the sprite in the class variable
+		spikeSprite = (SpriteStore.get()).getSprite("sprites/trap.png");
+	} // loadSpikeImage
 
 	public int getX() {
 		return x;
@@ -44,4 +52,7 @@ public class Spike {
 		return height;
 	}
 
+	public Rectangle getHitBox() {
+		return hitBox;
+	}
 }
