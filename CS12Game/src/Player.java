@@ -237,7 +237,6 @@ public class Player extends Entity{
 			if (this.currentHealth <= 0) game.notifyDeath();
 		} // if
 		updateHealthBar();
-		System.out.println(currentHealth);
 	} // changeHealth
 
     // add delay in taking spike damage
