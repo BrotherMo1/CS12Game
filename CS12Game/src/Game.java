@@ -69,8 +69,10 @@ public class Game extends Canvas {
     private final long SHIFT_DELAY = 1000; // ms
     private boolean shifting = false;
     private long shiftStartTime = 0;
-    private static final long SHIFT_DURATION = 500; // 1 second per phase
+    private static final long SHIFT_DURATION = 1000; // 1 second per phase
     private int shiftPhase = 0; // 0 = not shifting, 1 = pre-shift pause, 2 = post-shift pause
+	private boolean shiftedState = false;
+
 
 
     private String message = ""; // message to display while waiting
@@ -114,6 +116,8 @@ public class Game extends Canvas {
 	private int statusBarY = (int) (10 * Game.SCALE);
 
 	private boolean dead = false;
+	
+	private boolean showGameTutorial = false;
 	
     /*
      * Construct our game and set it running.
@@ -189,6 +193,7 @@ public class Game extends Canvas {
 				
 				initMaps();
 	    		loadMap(0);
+	    		showTutorial();
 	    		startGame();
 	    
 	    		// start the game
@@ -199,6 +204,22 @@ public class Game extends Canvas {
 
 
     } // constructor
+    
+	private void showTutorial() {
+		Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
+		(SpriteStore.get()).getSprite("sprites/tutorialMenu.png").draw(g, 0, 0);
+
+		strategy.show();
+
+		if (playing && !gameRunning) {
+			gameRunning = !gameRunning;
+			try {
+				Thread.sleep(3000);
+			} catch (Exception e) {
+			} // catch
+			gameStartTime = System.currentTimeMillis();
+		} // if
+	} // showTutorial
 
  // create startMenu
  		private void startMenu() {
@@ -708,7 +729,7 @@ public class Game extends Canvas {
 
         // keep loop running until game ends
         while (gameRunning) {
-
+	       	
             // calc. time since last update, will be used to calculate
             // entities movement
             long delta = System.currentTimeMillis() - lastLoopTime;
@@ -722,7 +743,12 @@ public class Game extends Canvas {
             // get graphics context for the accelerated surface and make it black
             Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
             g.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-            (SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
+            
+            if (!shiftedState) {
+				(SpriteStore.get()).getSprite("sprites/bng.png").draw(g, 0, 0);
+			} else {
+				(SpriteStore.get()).getSprite("sprites/bngs.png").draw(g, 0, 0);
+			} // else;
             
             // check for dmg and update health
             player.dmgChecker();
@@ -778,7 +804,7 @@ public class Game extends Canvas {
 				} // for
 
 				for (Platform platform : platforms)
-					platform.draw(g, xLvlOffset);
+					platform.draw(g, xLvlOffset, shiftedState);
 				for (Spike spike : spikes)
 					spike.draw(g, xLvlOffset);
 
@@ -824,6 +850,10 @@ public class Game extends Canvas {
 					} // for
 				} // if
                 
+				if (showGameTutorial) {
+					showTutorial();
+				}
+				
                 // clear graphics and flip buffer
                 g.dispose();
                 strategy.show();
@@ -846,6 +876,7 @@ public class Game extends Canvas {
                     long elapsed = currentTime - shiftStartTime;
                     if (elapsed >= SHIFT_DURATION && shifted) {
                         // toggle map
+                    	shiftedState = !shiftedState;
                         if (currentMap % 2 == 0) {
                             currentMap++;
                         } else {
@@ -907,7 +938,7 @@ public class Game extends Canvas {
 	   	               entity.draw(g, xLvlOffset);
 	   	          } // for
 	   	        
-	   	         for (Platform platform : platforms) platform.draw(g, xLvlOffset);
+	   	         for (Platform platform : platforms) platform.draw(g, xLvlOffset, shiftedState);
 	   	         
 	         	 (SpriteStore.get()).getSprite("sprites/pause.png").draw(g, GAME_WIDTH / 2 - 200, 100);
 	         	 (SpriteStore.get()).getSprite("sprites/menu_background.png").draw(g, GAME_WIDTH / 2 - 211, 220);
@@ -983,8 +1014,11 @@ public class Game extends Canvas {
 		dead = false;
 		player.healthWidth = healthBarWidth;
 		player.updateHealthBar();
+		if (shiftedState) {
+			currentMap--;
+		} // if
 		loadMap(currentMap);
-
+		shiftedState = false;
 		if (!timerRunning) {
 			timerRunning = true;
 			// Adjust gameStartTime to account for the elapsed time so far
@@ -1013,9 +1047,10 @@ public class Game extends Canvas {
                 return;
             } // if
 
-            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT || e.getKeyCode() == KeyEvent.VK_S) {
             	if(!shifting) {
                 shifted = !shifted;
+//                shiftedState = !shiftedState;
             	}
             }
 
@@ -1034,9 +1069,9 @@ public class Game extends Canvas {
                     upPressed = true;
                 } // if
 
-                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    firePressed = true;
-                } // if
+                if (e.getKeyCode() == KeyEvent.VK_SPACE || e.getKeyCode() == KeyEvent.VK_H) {
+					showGameTutorial = !showGameTutorial;
+				} // if
             }
 
 			if (e.getKeyCode() == KeyEvent.VK_P || e.getKeyCode() == KeyEvent.VK_ESCAPE) {
@@ -1086,10 +1121,7 @@ public class Game extends Canvas {
                 } // else
             } // if waitingForKeyPress
 
-            // if escape is pressed, end game
-            if (e.getKeyChar() == 27) {
-                System.exit(0);
-            } // if escape pressed
+         
 
         } // keyTyped
 
