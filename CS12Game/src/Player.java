@@ -13,10 +13,17 @@ public class Player extends Entity{
     private boolean takenFallDamage = false;
     private double impactSpeed = 0;
     
+    private int hitboxWidth = (int)(24 * Game.SCALE);
+    private int hitboxHeight = (int)(38 * Game.SCALE);
+    private int offsetX = 0;
+    private int offsetY = 0;
+    
+    
 	private long lastDamageTimeSpike = 0;
 	private long damageCooldownSpike = 500; // ms
 	
 	private boolean animationFinished = false;
+	private boolean facingRight = true;
 	
 	private Sprite[] idleFrames;
 	private Sprite[] runFrames;
@@ -55,8 +62,10 @@ public class Player extends Entity{
 	    this.currentHealth = this.maxHealth;
 	    this.healthWidth = game.healthBarWidth;
 	    
-
-	    me.setBounds(newX, newY, sprite.getWidth(), sprite.getHeight());
+	    offsetX = (int)((sprite.getWidth() * Game.SCALE) - hitboxWidth) / 2;
+	    offsetY = (int)((sprite.getHeight() * Game.SCALE) - hitboxHeight) / 2;
+	    
+	    me.setBounds((int)x, (int)y, hitboxWidth, hitboxHeight);
 	}
 	
 	public void printAnimationDebug() {
@@ -71,7 +80,7 @@ public class Player extends Entity{
 		idleFrames = loadFrames("sprites/animations/idle/idle", 7); 
 		jumpFrames = loadFrames("sprites/animations/jump/jump", 2);
 		fallFrames = loadFrames("sprites/animations/fall/fall", 3);
-		portalFrames = loadFrames("sprites/animations/portal/portal", 14);
+		portalFrames = loadFrames("sprites/animations/portal/portal", 10);
 		runFrames = loadFrames("sprites/animations/run/run", 8);
 		deathFrames = loadFrames("sprites/animations/death/death", 12);
 		hurtFrames = loadFrames("sprites/animations/hurt/hurt", 4);
@@ -81,7 +90,9 @@ public class Player extends Entity{
 	private void updateAnimationState(){
 	    PlayerState previous = state;
 
-	    // --- Determine State ---
+	    if (state == PlayerState.DEATH) return;   // never change
+	    if (state == PlayerState.HURT && !animationFinished) return; // wait till hurt finishes
+	    
 	    if (game.isShifting()) {
 	        state = PlayerState.PORTAL; 
 	    } else if (!onGround) {
@@ -121,7 +132,7 @@ public class Player extends Entity{
  	        case DEATH:
  	        	return deathFrames[animationIndex];
  	        case HURT:
- 	        	return hurtFrames[animationIndex % hurtFrames.length];
+ 	        	return hurtFrames[animationIndex];
  	        	
  	        default:
  	        	break;
@@ -136,7 +147,8 @@ public class Player extends Entity{
 	        lastFrameTime = now;
 
 	        // If the animation should NOT loop
-	        if (state == PlayerState.JUMP || state == PlayerState.FALL) {
+	        if (state == PlayerState.JUMP || state == PlayerState.FALL || 
+	        		state == PlayerState.HURT || state == PlayerState.DEATH) {
 
 	            if (!animationFinished) {
 	                animationIndex++;
@@ -172,9 +184,7 @@ public class Player extends Entity{
 	@Override
 	public void draw (Graphics g, int xLvlOffset) {
 		Sprite current = getCurrentAnimationFrame();
-		
-		if (dx < 0) {
-		}
+
 		
 		g.drawRect(
 		        (int) x - xLvlOffset,
@@ -182,7 +192,21 @@ public class Player extends Entity{
 		        me.width,
 		        me.height
 		    );
-   	 	current.draw(g, (int)x - xLvlOffset,(int)y);
+		int drawX = (int)x - offsetX - xLvlOffset;
+		int drawY = (int)y - offsetY;
+		int drawWidth = (int) (current.getWidth() * Game.SCALE);
+		int drawHeight = (int) (current.getHeight() * Game.SCALE);
+
+		if (!facingRight) {
+		    g.drawImage(current.getImage(),
+		        drawX + (int)(sprite.getWidth() * Game.SCALE), // shift for flip
+		        drawY,
+		        -drawWidth,
+		        drawHeight,
+		        null);
+		} else {
+		    g.drawImage(current.getImage(), drawX, drawY, drawWidth, drawHeight, null);
+		}
     }  // draw
 	
 	
@@ -211,7 +235,7 @@ public class Player extends Entity{
 			takenFallDamage = false;
 		}
 		// check if player falls out of bounds, if true kill them
-		if (y > game.GAME_HEIGHT - 50) {
+		if (y > game.GAME_HEIGHT + 50) {
 			changeHealth(-this.maxHealth);
 	    } // if
 		
@@ -229,12 +253,24 @@ public class Player extends Entity{
     
     // change health if player falls out of bounds or gets hit
     private void changeHealth(int value) {
+    	
 
 		if (value < 0) {
 			this.currentHealth += value;
 			this.currentHealth = Math.max(Math.min(this.currentHealth, this.maxHealth), 0);
+			state = PlayerState.HURT;
+			animationIndex = 0;
+			animationFinished = false;
+			
 
-			if (this.currentHealth <= 0) game.notifyDeath();
+			if (this.currentHealth <= 0) {
+				state = PlayerState.DEATH;
+				animationIndex = 0;
+	            animationFinished = false;
+				game.notifyDeath();
+				
+
+			}
 		} // if
 		updateHealthBar();
 	} // changeHealth
@@ -252,7 +288,21 @@ public class Player extends Entity{
         updateAnimationState();
         updateAnimationFrame();
 
-        if (game.isShifting()) return;
+        if (game.isShifting()) {
+            // Only run vertical collision logic, not horizontal movement
+            for (Platform platform : game.getPlatforms()) {
+                if (me.intersects(platform.hitBox)) {
+                    if (dy > 0) { // falling
+                        y = platform.y - me.height;
+                        dy = 0;
+                        onGround = true;
+                        me.setLocation((int)x, (int)y);
+                        break;
+                    }
+                }
+            }
+            return; // skip normal horizontal movement
+        }
 
         // Horizontal movement
         x += (dx * delta) / 1000.0;
@@ -328,20 +378,22 @@ public class Player extends Entity{
 	} // jump
 	
 	
-	public void takeDamage(int amount) {
-		state = PlayerState.HURT;
-	    currentHealth -= amount;
-	    if (currentHealth < 0) currentHealth = 0;
-
-	    if (currentHealth == 0) {
-	    	state = PlayerState.DEATH;
-	        game.notifyDeath();
-	    }
-	}
+//	public void takeDamage(int amount) {
+//		
+//	    currentHealth -= amount;
+//	    if (currentHealth < 0) currentHealth = 0;
+//
+//	    if (currentHealth == 0) {
+//	    	
+//	        game.notifyDeath();
+//	    }
+//	}
 
 	
 	public void setHorizontalMovement(double dx) {
 	    this.dx = dx;
+	    if (dx > 0) facingRight = true;
+	    if (dx < 0) facingRight = false;
 	}
 	
 	public void setVerticalMovement(double newDY) {

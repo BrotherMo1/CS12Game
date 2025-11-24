@@ -69,7 +69,7 @@ public class Game extends Canvas {
     private final long SHIFT_DELAY = 1000; // ms
     private boolean shifting = false;
     private long shiftStartTime = 0;
-    private static final long SHIFT_DURATION = 500; // 1 second per phase
+    private static final long SHIFT_DURATION = 500; // 0.5 second per phase
     private int shiftPhase = 0; // 0 = not shifting, 1 = pre-shift pause, 2 = post-shift pause
 
 
@@ -230,7 +230,7 @@ public class Game extends Canvas {
     private void initEntities() {
     	
         // create the ship and put in center of screen
-        player = new Player(this, "sprites/animations/idle/idle1.png", 70, 550);
+        player = new Player(this, "sprites/animations/idle/idle1.png", 70, 500);
         entities.add(player);
     } // initEntities
     
@@ -844,6 +844,7 @@ public class Game extends Canvas {
                 if (shifting) {
 
                     long elapsed = currentTime - shiftStartTime;
+                    shiftPhase = 1;
                     if (elapsed >= SHIFT_DURATION && shifted) {
                         // toggle map
                         if (currentMap % 2 == 0) {
@@ -854,6 +855,7 @@ public class Game extends Canvas {
                         loadMap(currentMap);
                         shifted = false;
                     } if (elapsed >= SHIFT_DURATION * 2) {
+                    	shiftPhase = 2;
                         shifting = false;
                         lastShiftTime = currentTime;
                     } // if
