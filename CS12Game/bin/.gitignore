@@ -4,3 +4,6 @@
 /Game.class
 /ShotEntity.class
 /sprites/
+/Entity.class
+/Player$PlayerState.class
+/Player.class

@@ -237,6 +237,7 @@ public class Player extends Entity{
 			if (this.currentHealth <= 0) game.notifyDeath();
 		} // if
 		updateHealthBar();
+		System.out.println(currentHealth);
 	} // changeHealth
 
     // add delay in taking spike damage
@@ -281,9 +282,12 @@ public class Player extends Entity{
                 if (dy > 0) { // falling
                     impactSpeed = dy;
                     if (impactSpeed > FALL_DAMAGE_THRESHOLD && !takenFallDamage) {
-                        changeHealth(-10);
+                        int damage = (int)((impactSpeed - FALL_DAMAGE_THRESHOLD) / 25);
+
+                        if (damage < 1) damage = 1;  // minimum damage
+                        changeHealth(-damage);
                         takenFallDamage = true;
-                    }
+                    } // if 
                     y = platform.y - me.height;
                     dy = 0;
                     me.setLocation((int)x, (int)y);
@@ -291,9 +295,9 @@ public class Player extends Entity{
                     y = platform.y + platform.height;
                     dy = 0;
                     me.setLocation((int)x, (int)y);
-                }
-            }
-        }
+                } // else if
+            } // if intersecting
+        } // for each platform
 
         // STABLE onGround CHECK
         boolean grounded = false;
