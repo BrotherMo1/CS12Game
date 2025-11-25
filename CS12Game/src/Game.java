@@ -56,20 +56,14 @@ public class Game extends Canvas {
 	private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
 	// to remove this loop
 	private Entity player; // the ship
-	private double moveSpeed = 600; // hor. vel. of ship (px/s)
-	private double yvel = 0;
-	private long lastFire = 0; // time last shot fired
-	private long alienLastFire = 0;
-	private int random = 0;
-	private long firingInterval = 300; // interval between shots (ms)
-	private long alienFiringInterval = 500;
-	private int alienCount; // # of aliens left on screen
+//	private double moveSpeed = 600; // hor. vel. of ship (px/s)
+//	private double yvel = 0;
+//	private int random = 0;
 	private long lastShiftTime = 0;
 	private final long SHIFT_DELAY = 0; // ms
 	private boolean shifting = false;
 	private long shiftStartTime = 0;
 	private static final long SHIFT_DURATION = 1000; // 1 second per phase
-	private int shiftPhase = 0; // 0 = not shifting, 1 = pre-shift pause, 2 = post-shift pause
 	private boolean shiftedState = false;
 
 	private String message = ""; // message to display while waiting
@@ -630,6 +624,7 @@ public class Game extends Canvas {
 
 	// helper method to determine if a collision occurs
 	public void collisionChecker() {
+
 		// brute force collisions, compare every entity
 		// against every other entity. If any collisions
 		// are detected notify both entities that it has
@@ -689,6 +684,8 @@ public class Game extends Canvas {
 			g.setColor(Color.white);
 			String health = player.currentHealth + "%";
 			g.drawString(health, player.healthWidth + 85, healthBarYStart + 25);
+			g.setFont(new Font("TimesRoman", Font.PLAIN, 24)); 
+			g.drawString("Health", healthBarXStart + statusBarX, healthBarYStart + 10);
 
 			if (!paused) {
 
