@@ -166,10 +166,12 @@ public class Player extends Entity {
 		Sprite current = getCurrentAnimationFrame();
 
 		g.drawRect((int) x - xLvlOffset, (int) y, me.width, me.height);
+		
 		int drawX = (int) x - offsetX - xLvlOffset;
 		int drawY = (int) y - offsetY;
 		int drawWidth = (int) (current.getWidth() * Game.SCALE);
 		int drawHeight = (int) (current.getHeight() * Game.SCALE);
+		
 		if (!facingRight) {
 			g.drawImage(current.getImage(), drawX + (int) (sprite.getWidth()
 					* Game.SCALE), // shift for flip
@@ -188,6 +190,13 @@ public class Player extends Entity {
 		}
 
 		return frames;
+	}
+	
+	public boolean atPortal () { 
+		Portal portal = game.getPortal();
+		if (portal == null) return false;
+		if (me.intersects(portal.getHitbox())) return true;
+		return false;
 	}
 
 	public void dmgChecker() {

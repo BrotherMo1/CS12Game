@@ -1,4 +1,4 @@
-/* Game.java
+ /* Game.java
  * Space Invaders Main Program
  *
  */
@@ -81,6 +81,7 @@ public class Game extends Canvas {
 
 	private boolean shifted = false;
 
+	private Portal portal;
 	private ArrayList<Platform> platforms = new ArrayList<>();
 	private ArrayList<Spike> spikes = new ArrayList<>();
 	private ArrayList<int[][]> maps = new ArrayList<>();
@@ -270,6 +271,8 @@ public class Game extends Canvas {
 		} // if
 		platforms = makePlatforms(maps.get(index));
 		spikes = makeSpikes(maps.get(index));
+		portal = null;
+		portal = makePortal(maps.get(index));
 	} // loadMap
 
 	private void checkCloseToBorder() {
@@ -299,7 +302,7 @@ public class Game extends Canvas {
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 49, 49, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1, 2, 2, 2 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 0, 0, 0, 16, 0, 0, 0, 13, 14, 14, 14 },
@@ -497,7 +500,6 @@ public class Game extends Canvas {
 
 	public ArrayList<Platform> makePlatforms(int[][] map) {
 		ArrayList<Platform> platforms = new ArrayList<>();
-		spikes.clear(); // Clear existing spikes
 
 		for (int row = 0; row < map.length; row++) {
 			for (int col = 0; col < map[row].length; col++) {
@@ -517,25 +519,25 @@ public class Game extends Canvas {
 			for (int col = 0; col < map[row].length; col++) {
 				if (map[row][col] == 49) {
 					spikes.add(new Spike(col * TILES_SIZE, row * TILES_SIZE, TILES_SIZE, TILES_SIZE));
-				}
-			}
-		}
+				} // if
+			} // for
+		} // for
 		return spikes;
 	} // makeSpikes
-
-	private boolean checkLevelEnd() {
-		// Define how close to the right edge triggers level end
-		int endZoneWidth = 50; // pixels
-		int mapRightEdge = lvlTilesWide * TILES_SIZE;
-		int playerRightEdge = player.getX() + player.sprite.getWidth();
-
-		// Check if player is in the end zone at the right edge
-		if (playerRightEdge >= mapRightEdge - endZoneWidth) {
-			return true;
-		}
-
-		return false;
+	
+	public Portal makePortal(int[][]map) {
+		
+		for (int row = 0; row < map.length; row++) {
+			for (int col = 0; col < map[row].length; col++) {
+				if (map[row][col] == 100) {
+					portal = new Portal(col * TILES_SIZE, row * TILES_SIZE);
+					return portal;
+				} // if
+			} // for
+		} // for
+		return new Portal(-100, -100);
 	}
+
 
 	private void goToNextLevel() {
 		if (currentMap % 2 == 1)
@@ -570,6 +572,11 @@ public class Game extends Canvas {
 	public ArrayList<Spike> getSpikes() {
 		return spikes;
 	}
+	
+	public Portal getPortal() {
+		return portal;
+	}
+	
 
 	/*
 	 * Notification from a game entity that the logic of the game should be run at
@@ -739,6 +746,8 @@ public class Game extends Canvas {
 				for (Spike spike : spikes)
 					spike.draw(g, xLvlOffset);
 
+				portal.draw(g, xLvlOffset);
+				
 				collisionChecker();
 
 				// remove dead entities
@@ -837,9 +846,9 @@ public class Game extends Canvas {
 				}
 
 				// Example: check if player reaches the right edge of the map
-				if (checkLevelEnd()) {
-					goToNextLevel();
-				}
+				if (player.atPortal()) goToNextLevel();
+					
+				
 
 				// pause
 				try {

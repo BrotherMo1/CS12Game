@@ -59,6 +59,10 @@ public abstract class Entity {
 	public boolean isOnGround() {
 		return isOnGround();
 	}
+	
+	public boolean atPortal () { 
+		return false;
+	}
 
 	// get and set velocities
 	public void setHorizontalMovement(double newDX) {
