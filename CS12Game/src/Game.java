@@ -243,7 +243,7 @@ public class Game extends Canvas {
 
 	public boolean isShifting() {
 		return shifting;
-	}
+	} // isShifting
 
 	private int getMapWidth(int index) {
 		if (index < 0 || index >= maps.size()) {
@@ -268,13 +268,13 @@ public class Game extends Canvas {
 			xLvlOffset += diff - rightBorder;
 		} else if (diff < leftBorder) {
 			xLvlOffset += diff - leftBorder;
-		}
+		} // else if
 
 		if (xLvlOffset > maxLvlOffsetX) {
 			xLvlOffset = maxLvlOffsetX;
 		} else if (xLvlOffset < 0) {
 			xLvlOffset = 0;
-		}
+		} // else if
 	} // checkCloseToBorder
 
 	private void initMaps() {
@@ -481,7 +481,7 @@ public class Game extends Canvas {
 			maps.add(shifts[i]);
 		} // for
 
-	}
+	} // init maps
 
 	public ArrayList<Platform> makePlatforms(int[][] map) {
 		ArrayList<Platform> platforms = new ArrayList<>();
@@ -493,7 +493,7 @@ public class Game extends Canvas {
 
 				if (tileValue >= 1 && tileValue <= 48) {
 					platforms.add(new Platform(col * TILES_SIZE, row * TILES_SIZE, TILES_SIZE, TILES_SIZE, tileValue));
-				}
+				} // if
 			} // for
 		} // for
 		return platforms;
@@ -505,12 +505,13 @@ public class Game extends Canvas {
 			for (int col = 0; col < map[row].length; col++) {
 				if (map[row][col] == 49) {
 					spikes.add(new Spike(col * TILES_SIZE, row * TILES_SIZE, TILES_SIZE, TILES_SIZE));
-				}
-			}
-		}
+				} // if spikes
+			} // for
+		} // for
 		return spikes;
 	} // makeSpikes
 
+	
 	private boolean checkLevelEnd() {
 		// Define how close to the right edge triggers level end
 		int endZoneWidth = 50; // pixels
@@ -523,8 +524,9 @@ public class Game extends Canvas {
 		}
 
 		return false;
-	}
+	} // checkLevelEnd
 
+	// goes to the next level
 	private void goToNextLevel() {
 		if (currentMap % 2 == 1)
 			currentMap++;
@@ -533,7 +535,7 @@ public class Game extends Canvas {
 		if (currentMap >= maps.size()) {
 			notifyWin();
 			return;
-		}
+		} // goToNextLevel
 
 		// Load the next map's platforms
 		loadMap(currentMap);
@@ -553,11 +555,11 @@ public class Game extends Canvas {
 
 	public ArrayList<Platform> getPlatforms() {
 		return platforms;
-	}
+	} // getPlatforms
 
 	public ArrayList<Spike> getSpikes() {
 		return spikes;
-	}
+	} // getSpikes
 
 	/*
 	 * Notification from a game entity that the logic of the game should be run at
@@ -577,7 +579,6 @@ public class Game extends Canvas {
 	/*
 	 * Notification that the player has died.
 	 */
-
 	public void notifyDeath() {
 		dead = true;
 		if (timerRunning) {
@@ -593,10 +594,8 @@ public class Game extends Canvas {
 		gameRunning = false;
 	} // notifyWin
 
-	/*
-	 * Notification than an alien has been killed
-	 */
 
+	// resets the game
 	public void resetGame() {
 		playing = false;
 		gameRunning = false;
@@ -667,17 +666,8 @@ public class Game extends Canvas {
 				(SpriteStore.get()).getSprite("sprites/bngs.png").draw(g, 0, 0);
 			} // else;
 
-			// check for dmg and update health
+			// check for dmg
 			player.dmgChecker();
-
-			// draw health bar
-			g.setColor(Color.red);
-			g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, player.healthWidth, healthBarHeight);
-			g.setColor(Color.white);
-			String health = player.currentHealth + "%";
-			g.drawString(health, player.healthWidth + 85, healthBarYStart + 25);
-			g.setFont(new Font("Arial", Font.PLAIN, 24)); 
-			g.drawString("Health:", healthBarXStart + statusBarX, healthBarYStart + 10);
 
 			if (!paused) {
 
@@ -743,6 +733,17 @@ public class Game extends Canvas {
 					logicRequiredThisLoop = false;
 				} // if
 
+				// draw health bar
+				g.setColor(Color.red);
+				g.fillRect(healthBarXStart + statusBarX, healthBarYStart + statusBarY, player.healthWidth,
+						healthBarHeight);
+				g.setColor(Color.white);
+				String health = player.currentHealth + "%";
+				g.drawString(health, player.healthWidth + 85, healthBarYStart + 25);
+				g.setFont(new Font("Arial", Font.PLAIN, 24));
+				g.drawString("Health:", healthBarXStart + statusBarX, healthBarYStart + 10);
+
+				
 				// if waiting for "any key press", draw message
 				if (waitingForKeyPress) {
 					g.setColor(Color.white);
@@ -878,7 +879,7 @@ public class Game extends Canvas {
 					GAME_HEIGHT / 2 - 250);
 
 			Button exitButton2 = new Button("sprites/backButton.png", "sprites/backButtonHover.png",
-					GAME_WIDTH / 2 + 50, 500);
+					GAME_WIDTH / 2 - 50, 500);
 			exitButton2.draw(g);
 
 			g.dispose();
@@ -898,7 +899,7 @@ public class Game extends Canvas {
 		initEntities();
 
 		// blank out any keyboard settings that might exist
-		currentMap = 0;
+		currentMap = 5;
 		loadMap(currentMap);
 		leftPressed = false;
 		rightPressed = false;
@@ -914,6 +915,7 @@ public class Game extends Canvas {
 
 	} // startGame
 
+	// make player retry level on failure
 	private void retryLevel() {
 		entities.clear();
 
@@ -1053,7 +1055,6 @@ public class Game extends Canvas {
 							|| mb.getButtonType().equals("sprites/continueButton2.png")) {
 						retryLevel();
 					} // else if
-
 				} // if
 			} // for
 
