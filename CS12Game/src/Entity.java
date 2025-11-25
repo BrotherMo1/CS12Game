@@ -53,7 +53,6 @@ public abstract class Entity {
 	} // move
 
 	public void jump() {
-		System.out.println("try jump");
 	}
 
 	public boolean isOnGround() {

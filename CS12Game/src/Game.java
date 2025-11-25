@@ -29,7 +29,6 @@ public class Game extends Canvas {
 	// a key is pressed
 	private boolean leftPressed = false; // true if left arrow key currently pressed
 	private boolean rightPressed = false; // true if right arrow key currently pressed
-	private boolean firePressed = false; // true if firing
 	private boolean upPressed = false;
 	private boolean paused = false;
 
@@ -39,9 +38,7 @@ public class Game extends Canvas {
 	public final static int TILES_IN_HEIGHT = 14;
 	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
 	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-	// TO MAKE WIDTH SCALABLE: TILES_SIZE * TILES_IN_WIDTH;
 	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
-	// TO MAKE HEIGHT SCALABLE: TILES_SIZE * TILES_IN_HEIGHT;
 
 	private int xLvlOffset;
 	private int leftBorder = (int) (0.2 * GAME_WIDTH);
@@ -56,9 +53,6 @@ public class Game extends Canvas {
 	private ArrayList<Entity> removeEntities = new ArrayList<Entity>(); // list of entities
 	// to remove this loop
 	private Entity player; // the ship
-//	private double moveSpeed = 600; // hor. vel. of ship (px/s)
-//	private double yvel = 0;
-//	private int random = 0;
 	private long lastShiftTime = 0;
 	private final long SHIFT_DELAY = 0; // ms
 	private boolean shifting = false;
@@ -116,7 +110,7 @@ public class Game extends Canvas {
 	 */
 	public Game() {
 		// create a frame to contain game
-		JFrame container = new JFrame("Space Invaders");
+		JFrame container = new JFrame("Dimension Drift");
 
 		// get hold the content of the frame
 		JPanel panel = (JPanel) container.getContentPane();
@@ -610,7 +604,6 @@ public class Game extends Canvas {
 		removeEntities.clear();
 		leftPressed = false;
 		rightPressed = false;
-		firePressed = false;
 		upPressed = false;
 		shifted = false;
 		paused = false;
@@ -676,7 +669,6 @@ public class Game extends Canvas {
 
 			// check for dmg and update health
 			player.dmgChecker();
-			player.updateHealthBar();
 
 			// draw health bar
 			g.setColor(Color.red);
@@ -684,8 +676,8 @@ public class Game extends Canvas {
 			g.setColor(Color.white);
 			String health = player.currentHealth + "%";
 			g.drawString(health, player.healthWidth + 85, healthBarYStart + 25);
-			g.setFont(new Font("TimesRoman", Font.PLAIN, 24)); 
-			g.drawString("Health", healthBarXStart + statusBarX, healthBarYStart + 10);
+			g.setFont(new Font("Arial", Font.PLAIN, 24)); 
+			g.drawString("Health:", healthBarXStart + statusBarX, healthBarYStart + 10);
 
 			if (!paused) {
 
@@ -910,7 +902,6 @@ public class Game extends Canvas {
 		loadMap(currentMap);
 		leftPressed = false;
 		rightPressed = false;
-		firePressed = false;
 		upPressed = false;
 		paused = false;
 		dead = false;
@@ -931,7 +922,6 @@ public class Game extends Canvas {
 		// blank out any keyboard settings that might exist
 		leftPressed = false;
 		rightPressed = false;
-		firePressed = false;
 		upPressed = false;
 		paused = false;
 		dead = false;
@@ -1019,10 +1009,6 @@ public class Game extends Canvas {
 
 			if (e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_W) {
 				upPressed = false;
-			} // if
-
-			if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-				firePressed = false;
 			} // if
 
 		} // keyReleased
