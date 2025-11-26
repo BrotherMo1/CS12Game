@@ -105,6 +105,8 @@ public class Game extends Canvas {
 
 	private boolean showGameTutorial = false;
 	private boolean tutorialShowed = false;
+	
+	
 
 	/*
 	 * Construct our game and set it running.
@@ -238,7 +240,7 @@ public class Game extends Canvas {
 	private void initEntities() {
 
 		// create the ship and put in center of screen
-		player = new Player(this, "sprites/animations/idle/idle1.png", 70, 550);
+		player = new Player(this, "sprites/animations/idle/idle1.png", 70, 600);
 		entities.add(player);
 	} // initEntities
 
@@ -589,7 +591,7 @@ public class Game extends Canvas {
 
 		// Reset player position at the start of the new map
 		player.x = 80; // starting X position
-		player.y = 300; // starting Y, adjust if needed
+		player.y = 600; // starting Y, adjust if needed
 		player.setHorizontalMovement(0);
 		player.setVerticalMovement(0);
 
@@ -793,19 +795,11 @@ public class Game extends Canvas {
 				g.setColor(Color.white);
 				String health = player.currentHealth + "%";
 				g.drawString(health, player.healthWidth + 85, healthBarYStart + 25);
-				g.setFont(new Font("Arial", Font.PLAIN, 24));
+				g.setFont(new Font("Goldman", Font.PLAIN, 24));
 				g.drawString("Health:", healthBarXStart + statusBarX, healthBarYStart + 10);
 
-				// if waiting for "any key press", draw message
-				if (waitingForKeyPress) {
-					g.setColor(Color.white);
-					g.drawString(message, (GAME_HEIGHT - g.getFontMetrics().stringWidth(message)) / 2, 285);
-					g.drawString("Press any key", (GAME_HEIGHT - g.getFontMetrics().stringWidth("Press any key")) / 2,
-							300);
-				} // if
-
 				g.setColor(Color.WHITE);
-				g.setFont(new Font("Arial", Font.BOLD, 30));
+				g.setFont(new Font("Goldman", Font.BOLD, 30));
 				g.drawString("Time: " + message, GAME_WIDTH / 2 - 150, 30);
 
 				if (dead && player.animationDone()) {
@@ -927,6 +921,7 @@ public class Game extends Canvas {
 		while (!gameRunning && playing) {
 			Graphics2D g = (Graphics2D) strategy.getDrawGraphics();
 			(SpriteStore.get()).getSprite("sprites/game_completed.png").draw(g, 0, 0);
+			
 
 			g.dispose();
 			strategy.show();
