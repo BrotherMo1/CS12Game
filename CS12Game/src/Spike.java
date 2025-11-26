@@ -9,7 +9,7 @@ public class Spike {
 	private int width;
 	private int height;
 
-	private Rectangle hitBox;
+	private Rectangle hitbox;
 	private Sprite spikeSprite; // Add this to store the sprite
 
 	public Spike(int x, int y, int TILES_DEFAULT_SIZE, int height) {
@@ -21,10 +21,11 @@ public class Spike {
 
 		loadSpikeImage(); // This should set the spikeSprite
 
-		hitBox = new Rectangle(x, y + (TILES_DEFAULT_SIZE / 2), TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE / 2);
+		hitbox = new Rectangle(x, y + (TILES_DEFAULT_SIZE / 2), TILES_DEFAULT_SIZE, TILES_DEFAULT_SIZE / 2);
 	} // Spike constructor
 
 	public void draw(Graphics2D gtd, int xLvlOffset) {
+		
 		// Draw the actual sprite image instead of a colored rectangle
 		if (spikeSprite != null) {
 			spikeSprite.draw(gtd, x - xLvlOffset, y - 20);
@@ -53,6 +54,6 @@ public class Spike {
 	}
 
 	public Rectangle getHitBox() {
-		return hitBox;
+		return hitbox;
 	}
 }
