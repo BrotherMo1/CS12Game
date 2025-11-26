@@ -44,9 +44,6 @@ public class Portal {
 		portal = frames[frameIndex];
 		int drawWidth = (int) (portal.getWidth() * Game.SCALE);
 		int drawHeight = (int) (portal.getHeight() * Game.SCALE);
-		
-		gtd.setColor(Color.red);
-		gtd.drawRect(hitbox.x - xLvlOffset, hitbox.y, hitbox.width, hitbox.height);
 				
 		gtd.drawImage(portal.getImage(), x - xLvlOffset, y, drawWidth, drawHeight, null);
 		

@@ -164,8 +164,7 @@ public class Player extends Entity {
 	@Override
 	public void draw(Graphics g, int xLvlOffset) {
 		Sprite current = getCurrentAnimationFrame();
-
-		g.drawRect((int) x - xLvlOffset, (int) y, me.width, me.height);
+		
 		int drawX = (int) x - offsetX - xLvlOffset;
 		int drawY = (int) y - offsetY;
 		int drawWidth = (int) (current.getWidth() * Game.SCALE);
