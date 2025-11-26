@@ -189,10 +189,20 @@ public class Player extends Entity {
 
 		return frames;
 	}
+	
+
+	public boolean atPortal () { 
+		Portal portal = game.getPortal();
+		if (portal == null) return false;
+		if (me.intersects(portal.getHitbox())) return true;
+		return false;
+	}
 
 	public void dmgChecker() {
 
 		// FALL DAMAGE CHECK
+		if (state == PlayerState.DEATH) return;
+
 
 		// Player has JUST landed this frame
 
@@ -248,7 +258,9 @@ public class Player extends Entity {
 
 	public void move(long delta) {
 		updateAnimationState();
+		
 		updateAnimationFrame();
+		if (state == PlayerState.DEATH) return;
 		if (game.isShifting()) {
 			// Only run vertical collision logic, not horizontal movement
 			for (Platform platform : game.getPlatforms()) {
@@ -344,6 +356,10 @@ public class Player extends Entity {
 	public void setVerticalMovement(double newDY) {
 		dy = newDY;
 	} // setVerticalMovement
+	
+	public boolean animationDone() {
+		return animationFinished;
+	}
 
 	// check if collisions;
 

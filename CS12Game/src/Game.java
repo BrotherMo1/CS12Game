@@ -69,6 +69,7 @@ public class Game extends Canvas {
 
 	private boolean shifted = false;
 
+	private Portal portal;
 	private ArrayList<Platform> platforms = new ArrayList<>();
 	private ArrayList<Spike> spikes = new ArrayList<>();
 	private ArrayList<int[][]> maps = new ArrayList<>();
@@ -258,6 +259,8 @@ public class Game extends Canvas {
 		} // if
 		platforms = makePlatforms(maps.get(index));
 		spikes = makeSpikes(maps.get(index));
+		portal = null;
+		portal = makePortal(maps.get(index));
 	} // loadMap
 
 	private void checkCloseToBorder() {
@@ -288,7 +291,7 @@ public class Game extends Canvas {
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 49, 49, 49, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1, 2, 2, 2 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 3, 0, 0, 0, 16, 0, 0, 0, 13, 14, 14, 14 },
@@ -317,7 +320,7 @@ public class Game extends Canvas {
 
 		// java 1D version
 		int[][] lvl2 = { { 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1, 2, 2 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 13, 14, 14 },
@@ -336,7 +339,7 @@ public class Game extends Canvas {
 		// java 1D version
 		int[][] shift2 = {
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1, 2, 2 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 16, 0, 0, 0, 13, 14, 14 },
@@ -364,7 +367,7 @@ public class Game extends Canvas {
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-						40, 0, 0, 0, 0, 0 },
+						40, 0, 0, 0, 100, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0,
@@ -376,7 +379,7 @@ public class Game extends Canvas {
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 37, 38, 38, 39, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 49, 49, 0, 0, 0, 37, 38, 38, 38, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0, 0, 0, 0 },
+0, 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 37, 38, 38, 38, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -395,7 +398,7 @@ public class Game extends Canvas {
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-						0, 0, 0, 0, 0, 0 },
+						0, 0, 0, 0, 100, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 40, 0,
 						0, 0, 0, 0, 0, 0, 0 },
 				{ 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -419,7 +422,7 @@ public class Game extends Canvas {
 						0, 0 },
 				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0 },
-				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100,
 						0, 0 },
 				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 37, 16, 38, 38, 38, 16, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0, 0, 0 },
@@ -450,7 +453,7 @@ public class Game extends Canvas {
 						0, 0 },
 				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0 },
-				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 4, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100,
 						0, 0 },
 				{ 13, 0, 0, 0, 0, 16, 0, 0, 0, 0, 16, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 						0, 0 },
@@ -671,7 +674,7 @@ public class Game extends Canvas {
 
 	} // initMaps
 
-	public ArrayList<Platform> makePlatforms(int[][] map) {
+	private ArrayList<Platform> makePlatforms(int[][] map) {
 		ArrayList<Platform> platforms = new ArrayList<>();
 		spikes.clear(); // Clear existing spikes
 
@@ -687,7 +690,7 @@ public class Game extends Canvas {
 		return platforms;
 	} // makePlatforms
 
-	public ArrayList<Spike> makeSpikes(int[][] map) {
+	private ArrayList<Spike> makeSpikes(int[][] map) {
 		ArrayList<Spike> spikes = new ArrayList<>();
 		for (int row = 0; row < map.length; row++) {
 			for (int col = 0; col < map[row].length; col++) {
@@ -699,19 +702,19 @@ public class Game extends Canvas {
 		return spikes;
 	} // makeSpikes
 
-	private boolean checkLevelEnd() {
-		// Define how close to the right edge triggers level end
-		int endZoneWidth = 50; // pixels
-		int mapRightEdge = lvlTilesWide * TILES_SIZE;
-		int playerRightEdge = player.getX() + player.sprite.getWidth();
-
-		// Check if player is in the end zone at the right edge
-		if (playerRightEdge >= mapRightEdge - endZoneWidth) {
-			return true;
-		}
-
-		return false;
-	} // checkLevelEnd
+	
+	private Portal makePortal(int[][]map) {
+		
+		for (int row = 0; row < map.length; row++) {
+			for (int col = 0; col < map[row].length; col++) {
+				if (map[row][col] == 100) {
+					portal = new Portal(col * TILES_SIZE, row * TILES_SIZE);
+					return portal;
+				} // if
+			} // for
+		} // for
+		return new Portal(-100, -100);
+	}
 
 	// goes to the next level
 	private void goToNextLevel() {
@@ -748,6 +751,10 @@ public class Game extends Canvas {
 		return spikes;
 	} // getSpikes
 
+
+	public Portal getPortal() {
+		return portal;
+	}
 	/*
 	 * Notification from a game entity that the logic of the game should be run at
 	 * the next opportunity
@@ -904,6 +911,9 @@ public class Game extends Canvas {
 				for (Spike spike : spikes)
 					spike.draw(g, xLvlOffset);
 
+				portal.draw(g, xLvlOffset);
+
+				
 				collisionChecker();
 
 				// remove dead entities
@@ -941,7 +951,7 @@ public class Game extends Canvas {
 				g.setFont(new Font("Arial", Font.BOLD, 30));
 				g.drawString("Time: " + message, GAME_WIDTH / 2 - 150, 30);
 
-				if (dead) {
+				if (dead && player.animationDone()) {
 					(SpriteStore.get()).getSprite("sprites/death_screen.png").draw(g, GAME_WIDTH / 2 - 250, 200);
 
 					for (Button b : buttons) {
@@ -1012,9 +1022,8 @@ public class Game extends Canvas {
 				}
 
 				// Example: check if player reaches the right edge of the map
-				if (checkLevelEnd()) {
-					goToNextLevel();
-				}
+				if (player.atPortal()) goToNextLevel();
+				
 
 				// pause
 				try {
@@ -1154,6 +1163,10 @@ public class Game extends Canvas {
 					shifted = !shifted;
 //                shiftedState = !shiftedState;
 				}
+			}
+			
+			if (e.getKeyCode() == KeyEvent.VK_0) {
+				goToNextLevel();
 			}
 
 			if (shifted == false) {

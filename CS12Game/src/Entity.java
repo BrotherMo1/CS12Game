@@ -135,5 +135,13 @@ public abstract class Entity {
 		// TODO Auto-generated method stub
 
 	}
+	
+	public boolean atPortal () { 
+		return false;
+	}
+	
+	public boolean animationDone() {
+		return false;
+	}
 
 } // Entity class
