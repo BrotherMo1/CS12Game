@@ -1,9 +1,7 @@
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 
 public class Spike {
-	private int TILE_SIZE = 50;
 	private int x;
 	private int y;
 	private int width;
@@ -25,7 +23,7 @@ public class Spike {
 	} // Spike constructor
 
 	public void draw(Graphics2D gtd, int xLvlOffset) {
-		
+
 		// Draw the actual sprite image instead of a colored rectangle
 		if (spikeSprite != null) {
 			spikeSprite.draw(gtd, x - xLvlOffset, y - 20);

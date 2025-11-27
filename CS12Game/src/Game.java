@@ -614,21 +614,7 @@ public class Game extends Canvas {
 	public Portal getPortal() {
 		return portal;
 	}
-	/*
-	 * Notification from a game entity that the logic of the game should be run at
-	 * the next opportunity
-	 */
-	public void updateLogic() {
-		logicRequiredThisLoop = true;
-	} // updateLogic
-
-	/*
-	 * Remove an entity from the game. It will no longer be moved or drawn.
-	 */
-	public void removeEntity(Entity entity) {
-		removeEntities.add(entity);
-	} // removeEntity
-
+	
 	/*
 	 * Notification that the player has died.
 	 */
@@ -665,26 +651,6 @@ public class Game extends Canvas {
 		player.updateHealthBar();
 
 	} // resetGame
-
-	// helper method to determine if a collision occurs
-	public void collisionChecker() {
-
-		// brute force collisions, compare every entity
-		// against every other entity. If any collisions
-		// are detected notify both entities that it has
-		// occurred
-		for (int i = 0; i < entities.size(); i++) {
-			for (int j = i + 1; j < entities.size(); j++) {
-				Entity me = (Entity) entities.get(i);
-				Entity him = (Entity) entities.get(j);
-
-				if (me.collidesWith(him)) {
-					me.collidedWith(him);
-					him.collidedWith(me);
-				} // if
-			} // inner for
-		} // outer for
-	} // collisionChecker
 
 	/*
 	 * gameLoop input: none output: none purpose: Main game loop. Runs throughout
@@ -771,22 +737,6 @@ public class Game extends Canvas {
 					spike.draw(g, xLvlOffset);
 
 				portal.draw(g, xLvlOffset);
-
-				
-				collisionChecker();
-
-				// remove dead entities
-				entities.removeAll(removeEntities);
-				removeEntities.clear();
-
-				// run logic if required
-				if (logicRequiredThisLoop) {
-					for (int i = 0; i < entities.size(); i++) {
-						Entity entity = entities.get(i);
-						entity.doLogic();
-					} // for
-					logicRequiredThisLoop = false;
-				} // if
 
 				// draw health bar
 				g.setColor(Color.red);
