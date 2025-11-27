@@ -240,7 +240,7 @@ public class Game extends Canvas {
 	private void initEntities() {
 
 		// create the ship and put in center of screen
-		player = new Player(this, "sprites/animations/idle/idle1.png", 70, 600);
+		player = new Player(this, "sprites/animations/idle/idle1.png", 70, 550);
 		entities.add(player);
 	} // initEntities
 
@@ -591,7 +591,7 @@ public class Game extends Canvas {
 
 		// Reset player position at the start of the new map
 		player.x = 80; // starting X position
-		player.y = 600; // starting Y, adjust if needed
+		player.y = 550; // starting Y, adjust if needed
 		player.setHorizontalMovement(0);
 		player.setVerticalMovement(0);
 
